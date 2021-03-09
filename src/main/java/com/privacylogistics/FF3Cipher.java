@@ -28,7 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FF3Cipher {
-    FF3Cipher(int radix, String key, String tweak) {
+    public FF3Cipher(int radix, String key, String tweak) {
         // Class FF3Cipher implements the FF3 format-preserving encryption algorithm
         this.radix = radix;
         this.key = HexStringToByteArray(key);
