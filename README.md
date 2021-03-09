@@ -14,6 +14,12 @@ Changes to minimum domain size and revised tweak length have been partially impl
 
 This project was built and tested with Java 11.  It uses the javax.crypto for AES encryption in ECB mode.
 
+## Build
+
+Build this project with gradle:
+
+`gradle build`
+
 ## Testing
 
 There are official [test vectors](http://csrc.nist.gov/groups/ST/toolkit/examples.html) for FF3 provided by NIST, which are used for testing in this package.
@@ -22,7 +28,13 @@ There are official [test vectors](http://csrc.nist.gov/groups/ST/toolkit/example
 
 The example code below can help you get started.
 
-tbd
+```java
+    FF3Cipher c = new FF3Cipher(10, "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
+    String plaintext = "4000001234567899";
+    String ciphertext = c.encrypt(pt);
+    String pt = c.decrypt(ciphertext);
+    System.out.println("%s %s", ciphertext, pt)
+```
 
 ## Usage
 
