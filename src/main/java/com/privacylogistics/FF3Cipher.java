@@ -104,10 +104,10 @@ public class FF3Cipher {
         // Split the message
         String A = plaintext.substring(0,u);
         String B = plaintext.substring(u);
-        logger.error("r {} A {} B {}", this.radix, A, B);
+        logger.info("r {} A {} B {}", this.radix, A, B);
 
         // Split the tweak
-        logger.error("tweak: {}", byteArrayToHexString(this.tweakBytes));
+        logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
         byte[] Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
         byte[] Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
 
@@ -119,8 +119,8 @@ public class FF3Cipher {
 
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
-        logger.error("u {} v {} modU: {} modV: {}", u, v, modU, modV);
-        logger.error("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
+        logger.info("u {} v {} modU: {} modV: {}", u, v, modU, modV);
+        logger.info("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
 
         for (byte i = 0; i < NUM_ROUNDS; ++ i) {
             int m;
@@ -144,7 +144,7 @@ public class FF3Cipher {
             byte[] S = this.aesCipher.doFinal(P);
 
             reverseBytes(S);
-            logger.error("\tS: {}", byteArrayToHexString(S));
+            logger.info("\tS: {}", byteArrayToHexString(S));
 
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
@@ -163,7 +163,7 @@ public class FF3Cipher {
                 c = c.mod(modV);
             }
 
-            logger.error("\tm: {} A: {} c: {} y: {}", m, A, c, y);
+            logger.info("\tm: {} A: {} c: {} y: {}", m, A, c, y);
 
             // Convert c to sting using radix and length m
             String C = c.toString(this.radix);
@@ -173,7 +173,7 @@ public class FF3Cipher {
             // Final steps
             A = B;
             B = C;
-            logger.warn("A: {} B: {}", A, B);
+            logger.info("A: {} B: {}", A, B);
         }
         return A+B;
     }
@@ -207,7 +207,7 @@ public class FF3Cipher {
         String B = ciphertext.substring(u);
 
         // Split the tweak
-        logger.error("tweak: {}", byteArrayToHexString(this.tweakBytes));
+        logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
         byte[] Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
         byte[] Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
 
@@ -219,8 +219,8 @@ public class FF3Cipher {
 
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
-        logger.error("modU: {} modV: {}", modU, modV);
-        logger.error("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
+        logger.info("modU: {} modV: {}", modU, modV);
+        logger.info("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
 
         for (byte i = (byte) (NUM_ROUNDS-1); i >= 0; --i) {
             int m;
@@ -244,7 +244,7 @@ public class FF3Cipher {
             byte[] S = this.aesCipher.doFinal(P);
 
             reverseBytes(S);
-            logger.error("\tS: {}", byteArrayToHexString(S));
+            logger.info("\tS: {}", byteArrayToHexString(S));
 
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
@@ -263,7 +263,7 @@ public class FF3Cipher {
                 c = c.mod(modV);
             }
 
-            logger.error("\tm: {} A: {} c: {} y: {}", m, A, c, y);
+            logger.info("\tm: {} A: {} c: {} y: {}", m, A, c, y);
 
             // Convert c to sting using radix and length m
             String C = c.toString(this.radix);
@@ -273,7 +273,7 @@ public class FF3Cipher {
             // Final steps
             B = A;
             A = C;
-            logger.warn("A: {} B: {}", A, B);
+            logger.info("A: {} B: {}", A, B);
         }
         return A+B;
     }
@@ -297,7 +297,7 @@ public class FF3Cipher {
         byte[] bBytes = new BigInteger(B, radix).toByteArray();
 
         System.arraycopy(bBytes,0,P,(BLOCK_SIZE-bBytes.length),bBytes.length);
-        logger.error("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
+        logger.info("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
         return P;
     }
 
