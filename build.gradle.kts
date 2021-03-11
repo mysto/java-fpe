@@ -2,8 +2,8 @@ plugins {
     java
 }
 
-group = "org.example"
-version = "0.8-SNAPSHOT"
+group = "com.privacylogistics"
+version = "0.8.1"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
