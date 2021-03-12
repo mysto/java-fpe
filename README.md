@@ -62,13 +62,13 @@ This implementation follows the algorithm as outlined in the NIST specification 
 
 While all test vectors pass, this package has not otherwise been extensively tested.
 
-Java's the standard library's [BigInteger](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/math/BigInteger.html) supports radices/bases up to 36. Therefore, this package supports a max base of 36, which can contain numeric digits 0-9 and lowercase alphabetic characters a-z.
+Java's [BigInteger](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/math/BigInteger.html) supports radices/bases up to 36. Therefore, this package also supports a max base of 36, which can contain numeric digits 0-9 and lowercase alphabetic characters a-z.
 
-FF3 uses a single-block encrypiton with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec.
+FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec.
 
 The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
 
-The tweak is required in the initial `FF3Cipher` constructor, but [todo] can optionally be overriden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
+The tweak is required in the initial `FF3Cipher` constructor, but can optionally be overriden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
 
 ## Author
 

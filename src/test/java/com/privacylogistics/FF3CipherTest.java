@@ -1,5 +1,22 @@
 package com.privacylogistics;
 
+/**
+ * Format-Preserving Encryption for FF3
+ *
+ * Copyright (c) 2021 Schoening Consulting LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -15,7 +32,7 @@ public class FF3CipherTest {
         int i=0, m=9, radix=10;
         String B = "567890000";
         byte[] W = FF3Cipher.HexStringToByteArray("FA330A73");
-        byte[] P = FF3Cipher.calculateP(i, m, radix, W, B);
+        byte[] P = FF3Cipher.calculateP(i, radix, W, B);
         Assert.assertArrayEquals(P, new byte[]
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
     }

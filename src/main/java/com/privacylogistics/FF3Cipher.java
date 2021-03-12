@@ -1,7 +1,7 @@
 package com.privacylogistics;
 
-/**
- * Format-Preserving Encryption
+/*
+ * Format-Preserving Encryption for FF3
  *
  * Copyright (c) 2021 Schoening Consulting LLC
  *
@@ -65,7 +65,7 @@ public class FF3Cipher {
 
         // AES block cipher in ECB mode with the block size derived based on the length of the key
         // Always use the reversed key since Encrypt and Decrypt call cipher expecting that
-        // Fiestel ciphers use the same func for encrypt/decrypt, so mode is always ENCRYPT_MODE
+        // Feistel ciphers use the same func for encrypt/decrypt, so mode is always ENCRYPT_MODE
 
         try {
             reverseBytes(this.key);
@@ -77,6 +77,13 @@ public class FF3Cipher {
             throw new RuntimeException(e);
         }
     }
+
+    /* convenience method to override tweak */
+    public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
+        this.tweakBytes = HexStringToByteArray(tweak);
+        return encrypt(plaintext);
+    }
+
     public String encrypt(String plaintext) throws BadPaddingException, IllegalBlockSizeException {
         int n = plaintext.length();
 
@@ -112,7 +119,7 @@ public class FF3Cipher {
         byte[] Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
 
         // P is always 16 bytes
-        byte[] P = new byte[BLOCK_SIZE];
+        byte[] P;
 
         // Pre-calculate the modulus since it's only one of 2 values,
         // depending on whether i is even or odd
@@ -137,7 +144,7 @@ public class FF3Cipher {
             }
 
             // P is fixed-length 16 bytes
-            P = calculateP( i, m, this.radix, W, B);
+            P = calculateP( i, this.radix, W, B);
 
             // Calculate S by operating on P in place
             reverseBytes(P);
@@ -178,6 +185,12 @@ public class FF3Cipher {
         return A+B;
     }
 
+    /* convenience method to override tweak */
+    public String decrypt(String ciphertext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
+        this.tweakBytes = HexStringToByteArray(tweak);
+        return decrypt(ciphertext);
+    }
+
     public String decrypt(String ciphertext) throws BadPaddingException, IllegalBlockSizeException {
         int n = ciphertext.length();
 
@@ -212,7 +225,7 @@ public class FF3Cipher {
         byte[] Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
 
         // P is always 16 bytes
-        byte[] P = new byte[BLOCK_SIZE];
+        byte[] P;
 
         // Pre-calculate the modulus since it's only one of 2 values,
         // depending on whether i is even or odd
@@ -237,7 +250,7 @@ public class FF3Cipher {
             }
 
             // P is fixed-length 16 bytes
-            P = calculateP( i, m, this.radix, W, A);
+            P = calculateP( i, this.radix, W, A);
 
             // Calculate S by operating on P in place
             reverseBytes(P);
@@ -278,7 +291,7 @@ public class FF3Cipher {
         return A+B;
     }
 
-    protected static byte[] calculateP(int i, int m, int radix, byte[] W, String B) {
+    protected static byte[] calculateP(int i, int radix, byte[] W, String B) {
 
         byte[] P = new byte[BLOCK_SIZE];     // P is always 16 bytes, zero initialized
 
@@ -330,20 +343,20 @@ public class FF3Cipher {
      */
     protected static String byteArrayToHexString(byte[] byteArray){
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < byteArray.length; i++){
-            String aByte = "".format("%02X", byteArray[i]);
+            String aByte = String.format("%02X", byteArray[i]);
             sb.append(aByte);
         }
         return sb.toString();
     }
     protected static String byteArrayToIntString(byte[] byteArray){
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append('[');
         for (int i = 0; i < byteArray.length; i++){
             // cast signed byte to int and mask for last byte
-            String aByte = "".format("%d ", ((int) byteArray[i]) & 0xFF);
+            String aByte = String.format("%d ", ((int) byteArray[i]) & 0xFF);
             sb.append(aByte);
         }
         sb.append(']');
