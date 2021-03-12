@@ -19,6 +19,14 @@ public class FF3CipherTest {
         Assert.assertArrayEquals(P, new byte[]
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
     }
+
+    /*
+     * NIST Test Vectors for 128, 198, and 256 bit modes
+     * https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf
+     */
+
+    // AES-128
+
     @Test
     public void test128dot1() throws Exception {
         // Sample #1 from NIST FF3-AES128
@@ -69,6 +77,9 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
+    // AES-192
+
     @Test
     public void test192dot1() throws Exception {
         // NIST FF3-AES128
@@ -119,6 +130,9 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
+    // AES-256
+
     @Test
     public void test256dot1() throws Exception {
         // NIST FF3-AES128
