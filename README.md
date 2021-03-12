@@ -22,7 +22,11 @@ Build this project with gradle:
 
 ## Testing
 
-There are official [test vectors](http://csrc.nist.gov/groups/ST/toolkit/examples.html) for FF3 provided by NIST, which are used for testing in this package.
+There are official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST, which are used for testing in this package.
+
+To run unit tests on this implementation, including all test vectors from the NIST specification, run the command:
+
+  1. `gradle test`
 
 ## Code Example
 
@@ -41,7 +45,14 @@ The example code below can help you get started.
 
 ## Usage
 
-FPE can be used for sensitive data tokenization, especially in regards to PCI and cryptographically reversible tokens. This implementation does not provide any guarantees regarding PCI DSS or other validation.
+FPE can be used for sensitive data tokenization, especially with PCI and cryptographically reversible tokens. This implementation does not provide any guarantees regarding PCI DSS or other validation.
+
+FF3 is a Feistel ciphers, and Feistel ciphers are initialized with a radix representing an alphabet.  Practial radix limits of 36 in Java means the following radix values are typical:
+* radix 10: digits 0..9
+* radix 26: alphabetic a-z
+* radix 36: alphanumeric 0..9, a-z
+
+Special characters and international character sets, such as those found in UTF-8, would require a larger radix, and are not supported.
 
 It's important to note that, as with any cryptographic package, managing and protecting the key appropriately to your situation is crucial. This package does not provide any guarantees regarding the key in memory.
 
