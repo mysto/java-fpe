@@ -26,6 +26,7 @@ public class FF3CipherTest {
         FF3Cipher c = new FF3Cipher(10, "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
         Assert.assertNotNull(c);
     }
+
     @Test
     public void testCalculateP() {
         // NIST Sample #1, round 0
@@ -35,6 +36,12 @@ public class FF3CipherTest {
         byte[] P = FF3Cipher.calculateP(i, radix, W, B);
         Assert.assertArrayEquals(P, new byte[]
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
+    }
+
+    @Test (expected=NumberFormatException.class)
+    public void testInvalidPlaintext() throws Exception {
+        FF3Cipher c = new FF3Cipher(10, "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
+        c.encrypt("222-22-2222");
     }
 
     /*
