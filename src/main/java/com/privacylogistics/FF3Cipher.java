@@ -32,7 +32,6 @@ public class FF3Cipher {
         // Class FF3Cipher implements the FF3 format-preserving encryption algorithm
         this.radix = radix;
         this.key = HexStringToByteArray(key);
-        //this.tweak = tweak;
 
         // Calculate range of supported message lengths [minLen..maxLen]
         // radix 10: 6 ... 56, 26: 5 ... 40, 36: 4 .. 36
@@ -89,19 +88,21 @@ public class FF3Cipher {
 
         // Check if message length is within minLength and maxLength bounds
         if ((n < this.minLen) || (n > this.maxLen)) {
-            throw new IllegalArgumentException("message length {n} is not within min {self.minLen} and max {self.maxLen} bounds");
+            throw new IllegalArgumentException(String.format("message length %d is not within min %d and max %d bounds",
+                    n, this.minLen, this.maxLen));
         }
 
         // Make sure the given the length of tweak in bits is 64
         if (this.tweakBytes.length != TWEAK_LEN){
-            throw new IllegalArgumentException("tweak length " + this.tweakBytes.length + " is invalid: tweak must be 8 bytes, or 64 bits");
+            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
+                    this.tweakBytes.length));
         }
 
         // Check if the plaintext message is formatted in the current radix
         try {
             new BigInteger(plaintext, this.radix);
         } catch (NumberFormatException ex) {
-            throw ex;
+            throw new NumberFormatException(String.format("The plaintext is not supported in the current radix %d", this.radix));
         }
 
         // Calculate split point
@@ -196,19 +197,21 @@ public class FF3Cipher {
 
         // Check if message length is within minLength and maxLength bounds
         if ((n < this.minLen) || (n > this.maxLen)) {
-            throw new IllegalArgumentException("message length {n} is not within min {self.minLen} and max {self.maxLen} bounds");
+            throw new IllegalArgumentException(String.format("message length %d is not within min %d and max %d bounds",
+                    n, this.minLen, this.maxLen));
         }
 
         // Make sure the given the length of tweak in bits is 64
         if (this.tweakBytes.length != TWEAK_LEN){
-            throw new IllegalArgumentException("tweak length " + this.tweakBytes.length + " is invalid: tweak must be 8 bytes, or 64 bits");
+            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
+                    this.tweakBytes.length));
         }
 
         // Check if the ciphertext message is formatted in the current radix
         try {
             new BigInteger(ciphertext, this.radix);
         } catch (NumberFormatException ex) {
-            throw ex;
+            throw new NumberFormatException(String.format("The plaintext is not supported in the current radix %d", this.radix));
         }
 
         // Calculate split point
@@ -330,7 +333,7 @@ public class FF3Cipher {
     }
 
     protected static byte[] HexStringToByteArray(String s) {
-        byte data[] = new byte[s.length()/2];
+        byte[] data = new byte[s.length()/2];
         for(int i=0;i < s.length();i+=2) {
             data[i/2] = (Integer.decode("0x"+s.charAt(i)+s.charAt(i+1))).byteValue();
         }
@@ -344,8 +347,8 @@ public class FF3Cipher {
     protected static String byteArrayToHexString(byte[] byteArray){
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < byteArray.length; i++){
-            String aByte = String.format("%02X", byteArray[i]);
+        for (byte b : byteArray) {
+            String aByte = String.format("%02X", b);
             sb.append(aByte);
         }
         return sb.toString();
@@ -354,9 +357,9 @@ public class FF3Cipher {
 
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        for (int i = 0; i < byteArray.length; i++){
+        for (byte b : byteArray) {
             // cast signed byte to int and mask for last byte
-            String aByte = String.format("%d ", ((int) byteArray[i]) & 0xFF);
+            String aByte = String.format("%d ", ((int) b) & 0xFF);
             sb.append(aByte);
         }
         sb.append(']');
@@ -372,10 +375,10 @@ public class FF3Cipher {
     public static int MAX_RADIX =    36;      // supports radix 2..36
     public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
 
-    private int radix;
-    private byte[] key;
+    private final int radix;
+    private final byte[] key;
     private byte[] tweakBytes;
-    private int minLen;
-    private int maxLen;
-    private Cipher aesCipher;
+    private final int minLen;
+    private final int maxLen;
+    private final Cipher aesCipher;
 }
