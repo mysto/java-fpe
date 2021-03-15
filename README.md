@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/mysto/java-fpe.svg?branch=main)](https://travis-ci.com/mysto/java-fpe)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # ff3 - Format Preserving Encryption in Java
@@ -14,19 +15,39 @@ Changes to minimum domain size and revised tweak length have been partially impl
 
 This project was built and tested with Java 11.  It uses the javax.crypto for AES encryption in ECB mode.
 
-## Build
+## Build & Testing
 
 Build this project with gradle:
 
 `gradle build`
 
-## Testing
-
 There are official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST, which are used for testing in this package.
 
 To run unit tests on this implementation, including all test vectors from the NIST specification, run the command:
 
-  1. `gradle test`
+  `gradle test`
+
+## Usage
+
+FF3 is a Feistel ciphers, and Feistel ciphers are initialized with a radix representing an alphabet.  
+Practial radix limits of 36 in Java means the following radix values are typical:
+* radix 10: digits 0..9
+* radix 26: alphabetic a-z
+* radix 36: alphanumeric 0..9, a-z
+
+Special characters and international character sets, such as those found in UTF-8, would require a larger radix, and are not supported.
+Also, all elements in a plaintext string share the same radix. Thus, an identification number that consists of a letter followed
+by 6 digits (e.g. A123456) cannot be correctly encrypted by FPE while preserving this convention.
+
+Input plaintext has maximum length restrictions based upon the chosen radix (2 * floor(96/log2(radix))):
+* radix 10: 56
+* radix 26: 40
+* radix 36: 36
+
+To work around string length, its possible to encode longer text in chunks.
+
+As with any cryptographic package, managing and protecting the key(s) is crucial. The tweak is generally not kept secret.
+This package does not protect the key in memory.
 
 ## Code Example
 
@@ -43,22 +64,11 @@ The example code below can help you get started.
     pt;ciphertext;plaintext
 ```
 
-## Usage
-
-FPE can be used for sensitive data tokenization, especially with PCI and cryptographically reversible tokens. This implementation does not provide any guarantees regarding PCI DSS or other validation.
-
-FF3 is a Feistel ciphers, and Feistel ciphers are initialized with a radix representing an alphabet.  Practial radix limits of 36 in Java means the following radix values are typical:
-* radix 10: digits 0..9
-* radix 26: alphabetic a-z
-* radix 36: alphanumeric 0..9, a-z
-
-Special characters and international character sets, such as those found in UTF-8, would require a larger radix, and are not supported.
-
-It's important to note that, as with any cryptographic package, managing and protecting the key appropriately to your situation is crucial. This package does not provide any guarantees regarding the key in memory.
-
 ## Implementation Notes
 
 This implementation follows the algorithm as outlined in the NIST specification as closely as possible, including naming.
+
+FPE can be used for sensitive data tokenization, especially with PCI and cryptographically reversible tokens. This implementation does not provide any guarantees regarding PCI DSS or other validation.
 
 While all test vectors pass, this package has not otherwise been extensively tested.
 
