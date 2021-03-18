@@ -28,10 +28,26 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FF3Cipher {
-    public FF3Cipher(int radix, String key, String tweak) {
-        // Class FF3Cipher implements the FF3 format-preserving encryption algorithm
+    /**
+     * Class FF3Cipher implements the FF3 format-preserving encryption algorithm with default
+     * radix of 10.
+     *
+     * @param key         encryption key used to initialize AES ECB
+     * @param tweak       used in each round and split into right and left sides
+     */
+    public FF3Cipher(String key, String tweak) {
+        this(key, tweak, 10);
+    }
+    /**
+     * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
+     *
+     * @param key         encryption key used to initialize AES ECB
+     * @param tweak       used in each round and split into right and left sides
+     * @param radix       the domain of the alphabet, 10, 26 or 36
+     */
+    public FF3Cipher(String key, String tweak, int radix) {
         this.radix = radix;
-        this.key = HexStringToByteArray(key);
+        byte[] keyBytes = HexStringToByteArray(key);
 
         // Calculate range of supported message lengths [minLen..maxLen]
         // radix 10: 6 ... 56, 26: 5 ... 40, 36: 4 .. 36
@@ -42,7 +58,7 @@ public class FF3Cipher {
         // We simplify the specs log[radix](2^96) to 96/log2(radix) using the log base change rule
         this.maxLen = (int) (2 * Math.floor(Math.log(Math.pow(2,96))/Math.log(radix)));
 
-        int keyLen = this.key.length;
+        int keyLen = keyBytes.length;
         // Check if the key is 128, 192, or 256 bits = 16, 24, or 32 bytes
         if (keyLen != 16 && keyLen != 24 && keyLen != 32) {
             throw new IllegalArgumentException("key length " + keyLen + " but must be 128, 192, or 256 bits");
@@ -56,7 +72,6 @@ public class FF3Cipher {
 
         // Make sure 2 <= minLength <= maxLength < 2*floor(log base radix of 2^96) is satisfied
         if ((this.minLen < 2) || (this.maxLen < this.minLen)) {
-            // ||((float) this.maxLen > (192 / Math.log2((float)(radix))))){
             throw new IllegalArgumentException ("minLen or maxLen invalid, adjust your radix");
         }
 
@@ -67,8 +82,8 @@ public class FF3Cipher {
         // Feistel ciphers use the same func for encrypt/decrypt, so mode is always ENCRYPT_MODE
 
         try {
-            reverseBytes(this.key);
-            SecretKeySpec keySpec = new SecretKeySpec(this.key, "AES");
+            reverseBytes(keyBytes);
+            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
             aesCipher = Cipher.getInstance("AES/ECB/NoPadding");
             aesCipher.init(Cipher.ENCRYPT_MODE, keySpec);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
@@ -376,7 +391,6 @@ public class FF3Cipher {
     public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
 
     private final int radix;
-    private final byte[] key;
     private byte[] tweakBytes;
     private final int minLen;
     private final int maxLen;
