@@ -57,7 +57,7 @@ The example code below can help you get started.
    jshell --class-path build/libs/java-fpe-X.X-SNAPSHOT.jar
 
     import com.privacylogistics.FF3Cipher;
-    FF3Cipher c = new FF3Cipher(10, "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
+    FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
     String pt = "4000001234567899";
     String ciphertext = c.encrypt(pt);
     String plaintext = c.decrypt(ciphertext);
