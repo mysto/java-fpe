@@ -1,11 +1,13 @@
 [![Build Status](https://travis-ci.com/mysto/java-fpe.svg?branch=main)](https://travis-ci.com/mysto/java-fpe)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Downloads](https://pepy.tech/badge/ff3)](https://pepy.tech/project/ff3)
 
 # ff3 - Format Preserving Encryption in Java
 
 An implementation of the NIST approved Format Preserving Encryption (FPE) FF3 algorithm in Java.
 
 * [NIST Recommendation SP 800-38G](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
+* [NIST FF3-1](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf)
 
 This package follows the FF3 algorithum for Format Preserving Encryption as described in the March 2016 NIST publication _Methods for Format-Preserving Encryption_, and revised on Feburary 28th, 2020 with a draft update for FF3-1.
 
@@ -29,10 +31,9 @@ To run unit tests on this implementation, including all test vectors from the NI
 
 ## Usage
 
-FF3 is a Feistel ciphers, and Feistel ciphers are initialized with a radix representing an alphabet.  
+FF3 is a Feistel cipher, and Feistel ciphers are initialized with a radix representing an alphabet.
 Practial radix limits of 36 in Java means the following radix values are typical:
 * radix 10: digits 0..9
-* radix 26: alphabetic a-z
 * radix 36: alphanumeric 0..9, a-z
 
 Special characters and international character sets, such as those found in UTF-8, would require a larger radix, and are not supported.
@@ -41,7 +42,6 @@ by 6 digits (e.g. A123456) cannot be correctly encrypted by FPE while preserving
 
 Input plaintext has maximum length restrictions based upon the chosen radix (2 * floor(96/log2(radix))):
 * radix 10: 56
-* radix 26: 40
 * radix 36: 36
 
 To work around string length, its possible to encode longer text in chunks.
@@ -52,6 +52,8 @@ This package does not protect the key in memory.
 ## Code Example
 
 The example code below can help you get started.
+
+Using default domain [0-9]
 
 ```jshell
    jshell --class-path build/libs/java-fpe-X.X-SNAPSHOT.jar
