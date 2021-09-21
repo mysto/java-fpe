@@ -47,7 +47,7 @@ public class FF3Cipher {
      */
     public FF3Cipher(String key, String tweak, int radix) {
         this.radix = radix;
-        byte[] keyBytes = HexStringToByteArray(key);
+        byte[] keyBytes = hexStringToByteArray(key);
 
         // Calculate range of supported message lengths [minLen..maxLen]
         // radix 10: 6 ... 56, 26: 5 ... 40, 36: 4 .. 36
@@ -75,7 +75,7 @@ public class FF3Cipher {
             throw new IllegalArgumentException ("minLen or maxLen invalid, adjust your radix");
         }
 
-        this.tweakBytes = HexStringToByteArray(tweak);
+        this.tweakBytes = hexStringToByteArray(tweak);
 
         // AES block cipher in ECB mode with the block size derived based on the length of the key
         // Always use the reversed key since Encrypt and Decrypt call cipher expecting that
@@ -94,7 +94,7 @@ public class FF3Cipher {
 
     /* convenience method to override tweak */
     public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
-        this.tweakBytes = HexStringToByteArray(tweak);
+        this.tweakBytes = hexStringToByteArray(tweak);
         return encrypt(plaintext);
     }
 
@@ -161,11 +161,10 @@ public class FF3Cipher {
 
             // P is fixed-length 16 bytes
             P = calculateP( i, this.radix, W, B);
+            reverseBytes(P);
 
             // Calculate S by operating on P in place
-            reverseBytes(P);
             byte[] S = this.aesCipher.doFinal(P);
-
             reverseBytes(S);
             logger.info("\tS: {}", byteArrayToHexString(S));
 
@@ -203,7 +202,7 @@ public class FF3Cipher {
 
     /* convenience method to override tweak */
     public String decrypt(String ciphertext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
-        this.tweakBytes = HexStringToByteArray(tweak);
+        this.tweakBytes = hexStringToByteArray(tweak);
         return decrypt(ciphertext);
     }
 
@@ -269,11 +268,10 @@ public class FF3Cipher {
 
             // P is fixed-length 16 bytes
             P = calculateP( i, this.radix, W, A);
+            reverseBytes(P);
 
             // Calculate S by operating on P in place
-            reverseBytes(P);
             byte[] S = this.aesCipher.doFinal(P);
-
             reverseBytes(S);
             logger.info("\tS: {}", byteArrayToHexString(S));
 
@@ -294,7 +292,7 @@ public class FF3Cipher {
                 c = c.mod(modV);
             }
 
-            logger.info("\tm: {} A: {} c: {} y: {}", m, A, c, y);
+            logger.info("\tm: {} B: {} c: {} y: {}", m, B, c, y);
 
             // Convert c to sting using radix and length m
             String C = c.toString(this.radix);
@@ -347,7 +345,7 @@ public class FF3Cipher {
         }
     }
 
-    protected static byte[] HexStringToByteArray(String s) {
+    protected static byte[] hexStringToByteArray(String s) {
         byte[] data = new byte[s.length()/2];
         for(int i=0;i < s.length();i+=2) {
             data[i/2] = (Integer.decode("0x"+s.charAt(i)+s.charAt(i+1))).byteValue();
@@ -387,7 +385,7 @@ public class FF3Cipher {
     public static int BLOCK_SIZE =   16;      // aes.BlockSize
     public static int TWEAK_LEN =    8;       // TODO: change to 7 bytes when 56-bit test vectors for FF3-1 become available
     public static int HALF_TWEAK_LEN = TWEAK_LEN/2;
-    public static int MAX_RADIX =    36;      // supports radix 2..36
+    public static int MAX_RADIX =    36;      // Java BigInteger supports radix 2..36
     public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
 
     private final int radix;

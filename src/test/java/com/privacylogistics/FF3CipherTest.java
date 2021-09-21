@@ -28,11 +28,21 @@ public class FF3CipherTest {
     }
 
     @Test
+    public void testByteArrayUtils() {
+        String hexstr = "BADA55";
+        byte[] bytestr = { (byte)0xba, (byte)0xda, (byte)0x55 };
+        byte[] hex = FF3Cipher.hexStringToByteArray(hexstr);
+        Assert.assertArrayEquals(hex, bytestr);
+        String str = FF3Cipher.byteArrayToHexString(hex);
+        Assert.assertEquals(hexstr, str);
+    }
+
+    @Test
     public void testCalculateP() {
         // NIST Sample #1, round 0
-        int i=0, m=9, radix=10;
+        int i=0, radix=10;
         String B = "567890000";
-        byte[] W = FF3Cipher.HexStringToByteArray("FA330A73");
+        byte[] W = FF3Cipher.hexStringToByteArray("FA330A73");
         byte[] P = FF3Cipher.calculateP(i, radix, W, B);
         Assert.assertArrayEquals(P, new byte[]
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
