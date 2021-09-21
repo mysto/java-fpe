@@ -9,7 +9,7 @@ An implementation of the NIST approved Format Preserving Encryption (FPE) FF3 al
 * [NIST Recommendation SP 800-38G](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
 * [NIST FF3-1](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf)
 
-This package follows the FF3 algorithum for Format Preserving Encryption as described in the March 2016 NIST publication _Methods for Format-Preserving Encryption_, and revised on Feburary 28th, 2020 with a draft update for FF3-1.
+This package follows the FF3 algorithm for Format Preserving Encryption as described in the March 2016 NIST publication _Methods for Format-Preserving Encryption_, and revised on February 28th, 2020 with a draft update for FF3-1.
 
 Changes to minimum domain size and revised tweak length have been partially implemented in this package with updates to domain size. It is expected that the final standard will provide new test vectors necessary to change the tweak lengths to 56 bits.  Currently, tweaks remain set to 64 bits.
 
@@ -32,7 +32,7 @@ To run unit tests on this implementation, including all test vectors from the NI
 ## Usage
 
 FF3 is a Feistel cipher, and Feistel ciphers are initialized with a radix representing an alphabet.
-Practial radix limits of 36 in Java means the following radix values are typical:
+Practical radix limits of 36 in Java means the following radix values are typical:
 * radix 10: digits 0..9
 * radix 36: alphanumeric 0..9, a-z
 
@@ -66,6 +66,20 @@ Using default domain [0-9]
     pt;ciphertext;plaintext
 ```
 
+## The FF3 Algorithm
+
+The FF3 algorithm is a tweakable block cipher based on an eight round Feistel cipher. A block cipher operates on fixed-length groups of bits, called blocks. A Feistel Cipher is not a specific cipher,
+but a design model.  This FF3 Feistel encryption consisting of eight rounds of processing
+the plaintext. Each round applies an internal function or _round function_, followed by transformation steps.
+
+The FF3 round function uses AES encryption in ECB mode, which is performed each iteration 
+on alternating halves of the text being encrypted. The *key* value is used only to initialize the AES cipher. Thereafter
+the *tweak* is used together with the intermediate encrypted text as input to the round function.
+
+## Other FPE Algorithms
+
+Only FF1 and FF3 have been approved by NIST for format preserving encryption. There are patent claims on FF1 which allegedly include open source implementations. Given the issues raised in ["The Curse of Small Domains: New Attacks on Format-Preserving Encryption"](https://eprint.iacr.org/2018/556.pdf) by Hoang, Tessaro and Trieu in 2018, it is prudent to be very cautious about using any FPE that isn't a standard and hasn't stood up to public scrutiny.
+
 ## Implementation Notes
 
 This implementation follows the algorithm as outlined in the NIST specification as closely as possible, including naming.
@@ -80,7 +94,7 @@ FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mod
 
 The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
 
-The tweak is required in the initial `FF3Cipher` constructor, but can optionally be overriden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
+The tweak is required in the initial `FF3Cipher` constructor, but can optionally be overridden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
 
 ## Author
 
