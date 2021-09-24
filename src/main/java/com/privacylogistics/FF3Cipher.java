@@ -379,8 +379,9 @@ public class FF3Cipher {
         return sb.toString();
     }
 
-
-    public static int DOMAIN_MIN =  1000000;  // 1M is currently recommended in FF3-1
+    // The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
+    // the minimum domain size for FF1 and FF3-1 is one million.
+    public static int DOMAIN_MIN =  1000000;  // 1M
     public static int NUM_ROUNDS =   8;
     public static int BLOCK_SIZE =   16;      // aes.BlockSize
     public static int TWEAK_LEN =    8;       // TODO: change to 7 bytes when 56-bit test vectors for FF3-1 become available
