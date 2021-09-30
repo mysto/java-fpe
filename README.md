@@ -6,10 +6,11 @@
 
 An implementation of the NIST approved Format Preserving Encryption (FPE) FF3 algorithm in Java.
 
-* [NIST Recommendation SP 800-38G](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
-* [NIST FF3-1](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf)
+This package follows the FF3 algorithm for Format Preserving Encryption as described in the March 2016 NIST publication 800-38G _Methods for Format-Preserving Encryption_, 
+and revised on February 28th, 2019 with a draft update for FF3-1.
 
-This package follows the FF3 algorithm for Format Preserving Encryption as described in the March 2016 NIST publication _Methods for Format-Preserving Encryption_, and revised on February 28th, 2020 with a draft update for FF3-1.
+* [NIST Recommendation SP 800-38G (FF3)](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
+* [NIST Recommendation SP 800-8Gr1 (FF3-1)](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf)
 
 Changes to minimum domain size and revised tweak length have been partially implemented in this package with updates to domain size. It is expected that the final standard will provide new test vectors necessary to change the tweak lengths to 56 bits.  Currently, tweaks remain set to 64 bits.
 
@@ -31,7 +32,8 @@ To run unit tests on this implementation, including all test vectors from the NI
 
 ## Usage
 
-FF3 is a Feistel cipher, and Feistel ciphers are initialized with a radix representing an alphabet.
+FF3 is a Feistel cipher, and Feistel ciphers are initialized with a radix representing an alphabet. The number of 
+characters in an alphabet is called the _radix_.
 Practical radix limits of 36 in Java means the following radix values are typical:
 * radix 10: digits 0..9
 * radix 36: alphanumeric 0..9, a-z
