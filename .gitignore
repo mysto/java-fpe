@@ -5,3 +5,5 @@
 # Distribution / packaging
 build/
 gradle/
+gradlew/
+gradlew.bat
