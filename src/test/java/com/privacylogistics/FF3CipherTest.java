@@ -19,6 +19,11 @@ package com.privacylogistics;
 
 import org.junit.Test;
 import org.junit.Assert;
+import java.math.BigInteger;
+
+import static com.privacylogistics.FF3Cipher.reverseString;
+import static com.privacylogistics.FF3Cipher.encode_int_r;
+import static com.privacylogistics.FF3Cipher.decode_int_r;
 
 public class FF3CipherTest {
     @Test
@@ -52,6 +57,23 @@ public class FF3CipherTest {
     public void testInvalidPlaintext() throws Exception {
         FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73", 10);
         c.encrypt("222-22-2222");
+    }
+
+    @Test
+    public void testEncodeInt() throws Exception {
+        Assert.assertEquals("101", reverseString(encode_int_r(5, 2, 3)));
+        Assert.assertEquals("11", reverseString(encode_int_r(6, 5, 2)));
+        Assert.assertEquals("00012", reverseString(encode_int_r(7, 5, 5)));
+        Assert.assertEquals("a", reverseString(encode_int_r(10, 16, 1)));
+        Assert.assertEquals("20", reverseString(encode_int_r(32, 16, 2)));
+    }
+
+    @Test
+    public void testDecodeInt() throws Exception {
+        Assert.assertEquals(BigInteger.valueOf(321), (decode_int_r("123", 10)));
+        Assert.assertEquals(BigInteger.valueOf(101), (decode_int_r("101", 10)));
+        Assert.assertEquals(BigInteger.valueOf(0x02), (decode_int_r("20", 16)));
+        Assert.assertEquals(BigInteger.valueOf(0xAA), (decode_int_r("aa", 16)));
     }
 
     /*

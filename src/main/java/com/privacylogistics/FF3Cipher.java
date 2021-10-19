@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,18 +33,19 @@ public class FF3Cipher {
      * Class FF3Cipher implements the FF3 format-preserving encryption algorithm with default
      * radix of 10.
      *
-     * @param key         encryption key used to initialize AES ECB
-     * @param tweak       used in each round and split into right and left sides
+     * @param key   encryption key used to initialize AES ECB
+     * @param tweak used in each round and split into right and left sides
      */
     public FF3Cipher(String key, String tweak) {
         this(key, tweak, 10);
     }
+
     /**
      * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
      *
-     * @param key         encryption key used to initialize AES ECB
-     * @param tweak       used in each round and split into right and left sides
-     * @param radix       the domain of the alphabet, 10, 26 or 36
+     * @param key   encryption key used to initialize AES ECB
+     * @param tweak used in each round and split into right and left sides
+     * @param radix the domain of the alphabet, 10, 26 or 36
      */
     public FF3Cipher(String key, String tweak, int radix) {
         this.radix = radix;
@@ -56,7 +58,7 @@ public class FF3Cipher {
         this.minLen = (int) Math.ceil(Math.log(DOMAIN_MIN) / Math.log(radix));
 
         // We simplify the specs log[radix](2^96) to 96/log2(radix) using the log base change rule
-        this.maxLen = (int) (2 * Math.floor(Math.log(Math.pow(2,96))/Math.log(radix)));
+        this.maxLen = (int) (2 * Math.floor(Math.log(Math.pow(2, 96)) / Math.log(radix)));
 
         int keyLen = keyBytes.length;
         // Check if the key is 128, 192, or 256 bits = 16, 24, or 32 bytes
@@ -67,12 +69,12 @@ public class FF3Cipher {
         // While FF3 allows radices in [2, 2^16], there is a practical limit to 36 (alphanumeric)
         // because Java BigInt only supports up to base 36.
         if ((radix < 2) || (radix > MAX_RADIX)) {
-            throw new IllegalArgumentException ("radix must be between 2 and 36, inclusive");
+            throw new IllegalArgumentException("radix must be between 2 and 36, inclusive");
         }
 
         // Make sure 2 <= minLength <= maxLength < 2*floor(log base radix of 2^96) is satisfied
         if ((this.minLen < 2) || (this.maxLen < this.minLen)) {
-            throw new IllegalArgumentException ("minLen or maxLen invalid, adjust your radix");
+            throw new IllegalArgumentException("minLen or maxLen invalid, adjust your radix");
         }
 
         this.tweakBytes = hexStringToByteArray(tweak);
@@ -108,7 +110,7 @@ public class FF3Cipher {
         }
 
         // Make sure the given the length of tweak in bits is 64
-        if (this.tweakBytes.length != TWEAK_LEN){
+        if (this.tweakBytes.length != TWEAK_LEN) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
                     this.tweakBytes.length));
         }
@@ -125,7 +127,7 @@ public class FF3Cipher {
         int v = n - u;
 
         // Split the message
-        String A = plaintext.substring(0,u);
+        String A = plaintext.substring(0, u);
         String B = plaintext.substring(u);
         logger.info("r {} A {} B {}", this.radix, A, B);
 
@@ -145,7 +147,7 @@ public class FF3Cipher {
         logger.info("u {} v {} modU: {} modV: {}", u, v, modU, modV);
         logger.info("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
 
-        for (byte i = 0; i < NUM_ROUNDS; ++ i) {
+        for (byte i = 0; i < NUM_ROUNDS; ++i) {
             int m;
             BigInteger c;
             byte[] W;
@@ -160,7 +162,7 @@ public class FF3Cipher {
             }
 
             // P is fixed-length 16 bytes
-            P = calculateP( i, this.radix, W, B);
+            P = calculateP(i, this.radix, W, B);
             reverseBytes(P);
 
             // Calculate S by operating on P in place
@@ -190,14 +192,14 @@ public class FF3Cipher {
             // Convert c to sting using radix and length m
             String C = c.toString(this.radix);
             C = reverseString(C);
-            C = C + "00000000".substring(0,m-C.length());
+            C = C + "00000000".substring(0, m - C.length());
 
             // Final steps
             A = B;
             B = C;
             logger.info("A: {} B: {}", A, B);
         }
-        return A+B;
+        return A + B;
     }
 
     /* convenience method to override tweak */
@@ -216,7 +218,7 @@ public class FF3Cipher {
         }
 
         // Make sure the given the length of tweak in bits is 64
-        if (this.tweakBytes.length != TWEAK_LEN){
+        if (this.tweakBytes.length != TWEAK_LEN) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
                     this.tweakBytes.length));
         }
@@ -233,7 +235,7 @@ public class FF3Cipher {
         int v = n - u;
 
         // Split the message
-        String A = ciphertext.substring(0,u);
+        String A = ciphertext.substring(0, u);
         String B = ciphertext.substring(u);
 
         // Split the tweak
@@ -252,7 +254,7 @@ public class FF3Cipher {
         logger.info("modU: {} modV: {}", modU, modV);
         logger.info("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
 
-        for (byte i = (byte) (NUM_ROUNDS-1); i >= 0; --i) {
+        for (byte i = (byte) (NUM_ROUNDS - 1); i >= 0; --i) {
             int m;
             BigInteger c;
             byte[] W;
@@ -267,7 +269,7 @@ public class FF3Cipher {
             }
 
             // P is fixed-length 16 bytes
-            P = calculateP( i, this.radix, W, A);
+            P = calculateP(i, this.radix, W, A);
             reverseBytes(P);
 
             // Calculate S by operating on P in place
@@ -297,14 +299,14 @@ public class FF3Cipher {
             // Convert c to sting using radix and length m
             String C = c.toString(this.radix);
             C = reverseString(C);
-            C = C + "00000000".substring(0,m-C.length());
+            C = C + "00000000".substring(0, m - C.length());
 
             // Final steps
             B = A;
             A = C;
             logger.info("A: {} B: {}", A, B);
         }
-        return A+B;
+        return A + B;
     }
 
     protected static byte[] calculateP(int i, int radix, byte[] W, String B) {
@@ -325,7 +327,7 @@ public class FF3Cipher {
         B = reverseString(B);
         byte[] bBytes = new BigInteger(B, radix).toByteArray();
 
-        System.arraycopy(bBytes,0,P,(BLOCK_SIZE-bBytes.length),bBytes.length);
+        System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
         logger.info("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
         return P;
     }
@@ -338,17 +340,17 @@ public class FF3Cipher {
      * Reverse a byte array in-place
      */
     protected void reverseBytes(byte[] b) {
-        for(int i=0; i<b.length/2; i++){
+        for (int i = 0; i < b.length / 2; i++) {
             byte temp = b[i];
-            b[i] = b[b.length -i -1];
-            b[b.length -i -1] = temp;
+            b[i] = b[b.length - i - 1];
+            b[b.length - i - 1] = temp;
         }
     }
 
     protected static byte[] hexStringToByteArray(String s) {
-        byte[] data = new byte[s.length()/2];
-        for(int i=0;i < s.length();i+=2) {
-            data[i/2] = (Integer.decode("0x"+s.charAt(i)+s.charAt(i+1))).byteValue();
+        byte[] data = new byte[s.length() / 2];
+        for (int i = 0; i < s.length(); i += 2) {
+            data[i / 2] = (Integer.decode("0x" + s.charAt(i) + s.charAt(i + 1))).byteValue();
         }
         return data;
     }
@@ -357,7 +359,7 @@ public class FF3Cipher {
      * used for debugging
      * Java 17 has java.util.HexFormat
      */
-    protected static String byteArrayToHexString(byte[] byteArray){
+    protected static String byteArrayToHexString(byte[] byteArray) {
 
         StringBuilder sb = new StringBuilder();
         for (byte b : byteArray) {
@@ -366,7 +368,8 @@ public class FF3Cipher {
         }
         return sb.toString();
     }
-    protected static String byteArrayToIntString(byte[] byteArray){
+
+    protected static String byteArrayToIntString(byte[] byteArray) {
 
         StringBuilder sb = new StringBuilder();
         sb.append('[');
@@ -379,6 +382,55 @@ public class FF3Cipher {
         return sb.toString();
     }
 
+    /* Return a string representation of a number in the given base system for 2..62
+
+            The string is left in a reversed order expected by the calling cryptographic function
+
+            examples:
+               encode_int_r(5)
+                '101'
+               encode_int_r(10, base=16)
+                'A'
+               encode_int_r(32, base=16)
+                '20'
+         */
+    protected static String encode_int_r(int n, int base, int length) {
+
+        if (base > MAX_RADIX) {
+            throw new NumberFormatException(String.format("Base %d is not supported in the current radix 2..62", base));
+        }
+
+        String x = new String();
+        while (n >= base) {
+            int b = n % base;
+            n = n / base;
+            x += BASE62[b];
+        }
+        x += BASE62[n];
+        System.out.println("ch: "+x);
+        if (x.length() < length) {
+            // left justify the string
+            x = x + String.join("", Collections.nCopies(length-x.length(), "0"));
+        }
+        return x;
+    }
+
+    protected static BigInteger decode_int_r(String str, int base) {
+
+        /* Decode a Base X encoded string into the number */
+
+        int strlen = str.length();
+        BigInteger num = BigInteger.ZERO;
+        int idx =0;
+        // Todo: iterate with -1 steps
+        for (char each : reverseString(str).toCharArray()) {
+            int power = (strlen - (idx + 1));
+            num = num.add(BigInteger.valueOf(BASE62STR.indexOf(each) * (int) (Math.pow(base, power))));
+            idx += 1;
+        }
+        return num;
+    }
+
     // The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
     // the minimum domain size for FF1 and FF3-1 is one million.
     public static int DOMAIN_MIN =  1000000;  // 1M
@@ -388,6 +440,8 @@ public class FF3Cipher {
     public static int HALF_TWEAK_LEN = TWEAK_LEN/2;
     public static int MAX_RADIX =    36;      // Java BigInteger supports radix 2..36
     public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
+    public static String BASE62STR = ("0123456789" + "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    public static char[] BASE62 = BASE62STR.toCharArray();
 
     private final int radix;
     private byte[] tweakBytes;
