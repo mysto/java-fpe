@@ -32,6 +32,8 @@ public class FF3CipherTest {
      * https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf
      */
 
+    static int Tradix=0, Tkey=1, Ttweak=2, Tplaintext=3, Tciphertext=4;
+
     static String[][] TestVectors = {
             // AES-128 - radix, key, tweak, plaintext, ciphertext
             { "10", "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73",
@@ -85,7 +87,34 @@ public class FF3CipherTest {
             }
         };
 
-    static int Tradix=0, Tkey=1, Ttweak=2, Tplaintext=3, Tciphertext=4;
+    static int Uradix=0, Ualphabet=1, Ukey=2, Utweak=3, Uplaintext=4, Uciphertext=5;
+
+    static String[][] TestVectors_ACVP_AES_FF3_1 = {
+            // AES-128 tg: 1-3 tc: 1-2  radix, alphabet, key, tweak, plaintext, ciphertext
+            {"10", "0123456789", "2DE79D232DF5585D68CE47882AE256D6", "CBD09280979564",
+                    "3992520240", "8901801106"
+            },
+            {"10", "0123456789", "01C63017111438F7FC8E24EB16C71AB5", "C4E822DCD09F27",
+                    "60761757463116869318437658042297305934914824457484538562",
+                    "35637144092473838892796702739628394376915177448290847293"
+            },
+            /*{"26", "abcdefghijklmnopqrstuvwxyz", "718385E6542534604419E83CE387A437", "B6F35084FA90E1",
+                    "wfmwlrorcd", "ywowehycyd"
+            },
+            {"26", "abcdefghijklmnopqrstuvwxyz", "DB602DFF22ED7E84C8D8C865A941A238", "EBEFD63BCC2083",
+                    "kkuomenbzqvggfbteqdyanwpmhzdmoicekiihkrm",
+                    "belcfahcwwytwrckieymthabgjjfkxtxauipmjja"
+            },
+            {"64", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/", "AEE87D0D485B3AFD12BD1E0B9D03D50D",
+                    "5F9140601D224B",
+                    "ixvuuIHr0e", "GR90R1q838"
+            },
+            {"64", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/", "7B6C88324732F7F4AD435DA9AD77F917",
+                    "3F42102C0BAB39",
+                    "21q1kbbIVSrAFtdFWzdMeIDpRqpo", "cvQ/4aGUV4wRnyO3CHmgEKW5hk8H"
+            }*/
+    };
+
 
     @Test
     public void testCreate() throws Exception {
@@ -137,14 +166,25 @@ public class FF3CipherTest {
         Assert.assertEquals(BigInteger.valueOf(0xAA), (decode_int_r("aa", 16)));
     }
 
-
-
     @Test
     public void testNistFF3() throws Exception {
         // NIST FF3-AES 128, 192, 256
         for( String[] testVector : TestVectors) {
             FF3Cipher c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], Integer.valueOf(testVector[Tradix]));
             String pt = testVector[Tplaintext], ct = testVector[Tciphertext];
+            String ciphertext = c.encrypt(pt);
+            String plaintext = c.decrypt(ciphertext);
+            Assert.assertEquals(ct, ciphertext);
+            Assert.assertEquals(pt, plaintext);
+        }
+    }
+
+    @Test
+    public void testAcvpFF3_1() throws Exception {
+        // ACVP FF3-AES 128, 192, 256
+        for( String[] testVector : TestVectors_ACVP_AES_FF3_1) {
+            FF3Cipher c = new FF3Cipher(testVector[Ukey], testVector[Utweak], Integer.valueOf(testVector[Uradix]));
+            String pt = testVector[Uplaintext], ct = testVector[Uciphertext];
             String ciphertext = c.encrypt(pt);
             String plaintext = c.decrypt(ciphertext);
             Assert.assertEquals(ct, ciphertext);
