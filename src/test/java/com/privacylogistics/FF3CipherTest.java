@@ -26,6 +26,67 @@ import static com.privacylogistics.FF3Cipher.encode_int_r;
 import static com.privacylogistics.FF3Cipher.decode_int_r;
 
 public class FF3CipherTest {
+
+    /*
+     * NIST Test Vectors for 128, 198, and 256 bit modes
+     * https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf
+     */
+
+    static String[][] TestVectors = {
+            // AES-128 - radix, key, tweak, plaintext, ciphertext
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73",
+                    "890121234567890000", "750918814058654607"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A94", "9A768A92F60E12D8",
+                    "890121234567890000", "018989839189395384"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73",
+                    "89012123456789000000789000000", "48598367162252569629397416226"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A94", "0000000000000000",
+                    "89012123456789000000789000000", "34695224821734535122613701434"
+            },
+            { "26", "EF4359D8D580AA4F7F036D6F04FC6A94", "9A768A92F60E12D8",
+                    "0123456789abcdefghi", "g2pk40i992fn20cjakb"
+            },
+
+            // AES-192 - radix, key, tweak, plaintext, ciphertext
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "D8E7920AFA330A73",
+                    "890121234567890000", "646965393875028755"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "9A768A92F60E12D8",
+                    "890121234567890000", "961610514491424446"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "D8E7920AFA330A73",
+                    "89012123456789000000789000000", "53048884065350204541786380807"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "0000000000000000",
+                    "89012123456789000000789000000", "98083802678820389295041483512"
+            },
+            { "26", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "9A768A92F60E12D8",
+                    "0123456789abcdefghi", "i0ihe2jfj7a9opf9p88"
+            },
+
+            // AES-256 - radix, key, tweak, plaintext, ciphertext
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "D8E7920AFA330A73",
+                    "890121234567890000", "922011205562777495"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "9A768A92F60E12D8",
+                    "890121234567890000", "504149865578056140"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "D8E7920AFA330A73",
+                    "89012123456789000000789000000", "04344343235792599165734622699"
+            },
+            { "10", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "0000000000000000",
+                    "89012123456789000000789000000", "30859239999374053872365555822"
+            },
+            { "26", "EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "9A768A92F60E12D8",
+                    "0123456789abcdefghi", "p0b2godfja9bhb7bk38"
+            }
+        };
+
+    static int Tradix=0, Tkey=1, Ttweak=2, Tplaintext=3, Tciphertext=4;
+
     @Test
     public void testCreate() throws Exception {
         FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
@@ -76,187 +137,27 @@ public class FF3CipherTest {
         Assert.assertEquals(BigInteger.valueOf(0xAA), (decode_int_r("aa", 16)));
     }
 
-    /*
-     * NIST Test Vectors for 128, 198, and 256 bit modes
-     * https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf
-     */
 
-    // AES-128
 
     @Test
-    public void test128dot1() throws Exception {
-        // Sample #1 from NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73", 10);
-        String pt = "890121234567890000", ct = "750918814058654607";
-        String ciphertext = c.encrypt(pt);
-        Assert.assertEquals(ct, ciphertext);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test128dot2() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "9A768A92F60E12D8", 10);
-        String pt = "890121234567890000", ct = "018989839189395384";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test128dot3() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73", 10);
-        String pt = "89012123456789000000789000000", ct = "48598367162252569629397416226";
-        String ciphertext = c.encrypt(pt);
-        Assert.assertEquals(ct, ciphertext);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test128dot4() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "0000000000000000", 10);
-        String pt = "89012123456789000000789000000", ct = "34695224821734535122613701434";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test128dot5() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "9A768A92F60E12D8", 26);
-        String pt = "0123456789abcdefghi", ct = "g2pk40i992fn20cjakb";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    // AES-192
-
-    @Test
-    public void test192dot1() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "D8E7920AFA330A73", 10);
-        String pt = "890121234567890000", ct = "646965393875028755";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test192dot2() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "9A768A92F60E12D8", 10);
-        String pt = "890121234567890000", ct = "961610514491424446";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test192dot3() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "D8E7920AFA330A73", 10);
-        String pt = "89012123456789000000789000000", ct = "53048884065350204541786380807";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test192dot4() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "0000000000000000", 10);
-        String pt = "89012123456789000000789000000", ct = "98083802678820389295041483512";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test192dot5() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6", "9A768A92F60E12D8", 26);
-        String pt = "0123456789abcdefghi", ct = "i0ihe2jfj7a9opf9p88";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    // AES-256
-
-    @Test
-    public void test256dot1() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "D8E7920AFA330A73", 10);
-        String pt = "890121234567890000", ct = "922011205562777495";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test256dot2() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "9A768A92F60E12D8", 10);
-        String pt = "890121234567890000", ct = "504149865578056140";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test256dot3() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "D8E7920AFA330A73", 10);
-        String pt = "89012123456789000000789000000", ct = "04344343235792599165734622699";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test256dot4() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "0000000000000000", 10);
-        String pt = "89012123456789000000789000000", ct = "30859239999374053872365555822";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
-    }
-
-    @Test
-    public void test256dot5() throws Exception {
-        // NIST FF3-AES128
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "9A768A92F60E12D8", 26);
-        String pt = "0123456789abcdefghi", ct = "p0b2godfja9bhb7bk38";
-        String ciphertext = c.encrypt(pt);
-        String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
+    public void testNistFF3() throws Exception {
+        // NIST FF3-AES 128, 192, 256
+        for( String[] testVector : TestVectors) {
+            FF3Cipher c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], Integer.valueOf(testVector[Tradix]));
+            String pt = testVector[Tplaintext], ct = testVector[Tciphertext];
+            String ciphertext = c.encrypt(pt);
+            String plaintext = c.decrypt(ciphertext);
+            Assert.assertEquals(ct, ciphertext);
+            Assert.assertEquals(pt, plaintext);
+        }
     }
 
     @Test
     public void testFF3_1() throws Exception {
         // Experimental test with 56 bit tweak
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A", 10);
-        String pt = "890121234567890000", ct = "477064185124354662";
+        String[] testVector = TestVectors[0];
+        FF3Cipher c = new FF3Cipher(testVector[Tkey], "D8E7920AFA330A", Integer.valueOf(testVector[Tradix]));
+        String pt = testVector[Tplaintext], ct = "477064185124354662";
         String ciphertext = c.encrypt(pt);
         String plaintext = c.decrypt(ciphertext);
         Assert.assertEquals(ct, ciphertext);
