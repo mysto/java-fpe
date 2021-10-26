@@ -95,6 +95,7 @@ public class FF3Cipher {
     }
 
     /* convenience method to override tweak */
+    @SuppressWarnings("unused")
     public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
         return encrypt(plaintext);
@@ -107,12 +108,6 @@ public class FF3Cipher {
         if ((n < this.minLen) || (n > this.maxLen)) {
             throw new IllegalArgumentException(String.format("message length %d is not within min %d and max %d bounds",
                     n, this.minLen, this.maxLen));
-        }
-
-        // Make sure the given the length of tweak in bits is 64
-        if (this.tweakBytes.length != TWEAK_LEN) {
-            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
-                    this.tweakBytes.length));
         }
 
         // Check if the plaintext message is formatted in the current radix
@@ -133,9 +128,32 @@ public class FF3Cipher {
 
         // Split the tweak
         logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
-        byte[] Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
-        byte[] Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
 
+        byte[] Tl;
+        byte[] Tr;
+        if (this.tweakBytes.length == TWEAK_LEN) {
+            // FF3
+            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
+            Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
+        } else if (this.tweakBytes.length == TWEAK_LEN_NEW)  {
+            // FF3-1
+            // The tweak is partitioned into a 32-bit left tweak and a 32-bit right tweak
+            // Tl is T[0..27] + 0000
+            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
+            Tl[3] &= 0xF0;
+
+            // Tr is T[32..55] + T[28..31] + 0000
+            Tr = new byte[HALF_TWEAK_LEN];
+            Tr[0] = this.tweakBytes[HALF_TWEAK_LEN];
+            Tr[1] = this.tweakBytes[HALF_TWEAK_LEN+1];
+            Tr[2] = this.tweakBytes[HALF_TWEAK_LEN+2];
+            Tr[3] = this.tweakBytes[3];
+            Tr[3] &= 0x0F;
+            Tr[3] = (byte) (Tr[3] << 4);
+        } else {
+            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
+                    this.tweakBytes.length));
+        }
         // P is always 16 bytes
         byte[] P;
 
@@ -203,6 +221,7 @@ public class FF3Cipher {
     }
 
     /* convenience method to override tweak */
+    @SuppressWarnings("unused")
     public String decrypt(String ciphertext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
         return decrypt(ciphertext);
@@ -215,12 +234,6 @@ public class FF3Cipher {
         if ((n < this.minLen) || (n > this.maxLen)) {
             throw new IllegalArgumentException(String.format("message length %d is not within min %d and max %d bounds",
                     n, this.minLen, this.maxLen));
-        }
-
-        // Make sure the given the length of tweak in bits is 64
-        if (this.tweakBytes.length != TWEAK_LEN) {
-            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
-                    this.tweakBytes.length));
         }
 
         // Check if the ciphertext message is formatted in the current radix
@@ -240,8 +253,32 @@ public class FF3Cipher {
 
         // Split the tweak
         logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
-        byte[] Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
-        byte[] Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
+
+        byte[] Tl;
+        byte[] Tr;
+        if (this.tweakBytes.length == TWEAK_LEN) {
+            // FF3
+            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
+            Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
+        } else if (this.tweakBytes.length == TWEAK_LEN_NEW)  {
+            // FF3-1
+            // The tweak is partitioned into a 32-bit left tweak and a 32-bit right tweak
+            // Tl is T[0..27] + 0000
+            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
+            Tl[3] &= 0xF0;
+
+            // Tr is T[32..55] + T[28..31] + 0000
+            Tr = new byte[HALF_TWEAK_LEN];
+            Tr[0] = this.tweakBytes[HALF_TWEAK_LEN];
+            Tr[1] = this.tweakBytes[HALF_TWEAK_LEN+1];
+            Tr[2] = this.tweakBytes[HALF_TWEAK_LEN+2];
+            Tr[3] = this.tweakBytes[3];
+            Tr[3] &= 0x0F;
+            Tr[3] = (byte) (Tr[3] << 4);
+        } else {
+            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
+                    this.tweakBytes.length));
+        }
 
         // P is always 16 bytes
         byte[] P;
@@ -400,7 +437,7 @@ public class FF3Cipher {
             throw new NumberFormatException(String.format("Base %d is not supported in the current radix 2..62", base));
         }
 
-        String x = new String();
+        String x = "";
         while (n >= base) {
             int b = n % base;
             n = n / base;
@@ -425,7 +462,7 @@ public class FF3Cipher {
         // Todo: iterate with -1 steps
         for (char each : reverseString(str).toCharArray()) {
             int power = (strlen - (idx + 1));
-            num = num.add(BigInteger.valueOf(BASE62STR.indexOf(each) * (int) (Math.pow(base, power))));
+            num = num.add(BigInteger.valueOf(BASE62STR.indexOf(each) * (long) (Math.pow(base, power))));
             idx += 1;
         }
         return num;
@@ -436,7 +473,8 @@ public class FF3Cipher {
     public static int DOMAIN_MIN =  1000000;  // 1M
     public static int NUM_ROUNDS =   8;
     public static int BLOCK_SIZE =   16;      // aes.BlockSize
-    public static int TWEAK_LEN =    8;       // TODO: change to 7 bytes when 56-bit test vectors for FF3-1 become available
+    public static int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
+    public static int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
     public static int HALF_TWEAK_LEN = TWEAK_LEN/2;
     public static int MAX_RADIX =    36;      // Java BigInteger supports radix 2..36
     public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());

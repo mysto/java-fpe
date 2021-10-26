@@ -35,7 +35,7 @@ public class FF3CipherTest {
     @Test
     public void testByteArrayUtils() {
         String hexstr = "BADA55";
-        byte[] bytestr = { (byte)0xba, (byte)0xda, (byte)0x55 };
+        byte[] bytestr = {(byte) 0xba, (byte) 0xda, (byte) 0x55};
         byte[] hex = FF3Cipher.hexStringToByteArray(hexstr);
         Assert.assertArrayEquals(hex, bytestr);
         String str = FF3Cipher.byteArrayToHexString(hex);
@@ -45,7 +45,7 @@ public class FF3CipherTest {
     @Test
     public void testCalculateP() {
         // NIST Sample #1, round 0
-        int i=0, radix=10;
+        int i = 0, radix = 10;
         String B = "567890000";
         byte[] W = FF3Cipher.hexStringToByteArray("FA330A73");
         byte[] P = FF3Cipher.calculateP(i, radix, W, B);
@@ -53,7 +53,7 @@ public class FF3CipherTest {
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
     }
 
-    @Test (expected=NumberFormatException.class)
+    @Test(expected = NumberFormatException.class)
     public void testInvalidPlaintext() throws Exception {
         FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73", 10);
         c.encrypt("222-22-2222");
@@ -93,6 +93,7 @@ public class FF3CipherTest {
         String plaintext = c.decrypt(ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test128dot2() throws Exception {
         // NIST FF3-AES128
@@ -103,6 +104,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test128dot3() throws Exception {
         // NIST FF3-AES128
@@ -113,6 +115,7 @@ public class FF3CipherTest {
         String plaintext = c.decrypt(ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test128dot4() throws Exception {
         // NIST FF3-AES128
@@ -120,9 +123,10 @@ public class FF3CipherTest {
         String pt = "89012123456789000000789000000", ct = "34695224821734535122613701434";
         String ciphertext = c.encrypt(pt);
         String plaintext = c.decrypt(ciphertext);
-         Assert.assertEquals(ct, ciphertext);
+        Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test128dot5() throws Exception {
         // NIST FF3-AES128
@@ -146,6 +150,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test192dot2() throws Exception {
         // NIST FF3-AES128
@@ -156,6 +161,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test192dot3() throws Exception {
         // NIST FF3-AES128
@@ -166,6 +172,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test192dot4() throws Exception {
         // NIST FF3-AES128
@@ -176,6 +183,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test192dot5() throws Exception {
         // NIST FF3-AES128
@@ -199,6 +207,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test256dot2() throws Exception {
         // NIST FF3-AES128
@@ -209,6 +218,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test256dot3() throws Exception {
         // NIST FF3-AES128
@@ -219,6 +229,7 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test256dot4() throws Exception {
         // NIST FF3-AES128
@@ -229,11 +240,23 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
     @Test
     public void test256dot5() throws Exception {
         // NIST FF3-AES128
         FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A942B7E151628AED2A6ABF7158809CF4F3C", "9A768A92F60E12D8", 26);
         String pt = "0123456789abcdefghi", ct = "p0b2godfja9bhb7bk38";
+        String ciphertext = c.encrypt(pt);
+        String plaintext = c.decrypt(ciphertext);
+        Assert.assertEquals(ct, ciphertext);
+        Assert.assertEquals(pt, plaintext);
+    }
+
+    @Test
+    public void testFF3_1() throws Exception {
+        // Experimental test with 56 bit tweak
+        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A", 10);
+        String pt = "890121234567890000", ct = "477064185124354662";
         String ciphertext = c.encrypt(pt);
         String plaintext = c.decrypt(ciphertext);
         Assert.assertEquals(ct, ciphertext);
