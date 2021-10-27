@@ -45,10 +45,12 @@ public class FF3Cipher {
      *
      * @param key   encryption key used to initialize AES ECB
      * @param tweak used in each round and split into right and left sides
-     * @param radix the domain of the alphabet, 10, 26 or 36
+     * @param alphabet the cipher alphabet
      */
-    public FF3Cipher(String key, String tweak, int radix) {
-        this.radix = radix;
+    public FF3Cipher(String key, String tweak, String alphabet) {
+        this.alphabet = alphabet;
+        this.radix = alphabet.length();
+
         byte[] keyBytes = hexStringToByteArray(key);
 
         // Calculate range of supported message lengths [minLen..maxLen]
@@ -94,7 +96,18 @@ public class FF3Cipher {
         }
     }
 
-    /* convenience method to override tweak */
+    /**
+     * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
+     *
+     * @param key   encryption key used to initialize AES ECB
+     * @param tweak used in each round and split into right and left sides
+     * @param radix the domain of the alphabet, 10, 26 or 36
+     */
+    public FF3Cipher(String key, String tweak, int radix) {
+        this(key, tweak, alphabetForBase(radix));
+    }
+
+        /* convenience method to override tweak */
     @SuppressWarnings("unused")
     public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
@@ -114,7 +127,7 @@ public class FF3Cipher {
         try {
             new BigInteger(plaintext, this.radix);
         } catch (NumberFormatException ex) {
-            throw new NumberFormatException(String.format("The plaintext is not supported in the current radix %d", this.radix));
+            throw new NumberFormatException(String.format("The plaintext %s is not supported in the current radix %d", plaintext, this.radix));
         }
 
         // Calculate split point
@@ -468,6 +481,21 @@ public class FF3Cipher {
         return num;
     }
 
+    protected static String alphabetForBase(int base) {
+        switch (base) {
+            case 10:
+                return "0123456789";
+            case 26:
+                return "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            case 36:
+                return "0123456789" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            case 64:
+                return "0123456789" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz";
+            default:
+                throw new RuntimeException("Unsupported radix");
+        }
+    }
+
     // The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
     // the minimum domain size for FF1 and FF3-1 is one million.
     public static int DOMAIN_MIN =  1000000;  // 1M
@@ -482,6 +510,7 @@ public class FF3Cipher {
     public static char[] BASE62 = BASE62STR.toCharArray();
 
     private final int radix;
+    private final String alphabet;
     private byte[] tweakBytes;
     private final int minLen;
     private final int maxLen;
