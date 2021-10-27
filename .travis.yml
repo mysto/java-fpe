@@ -6,6 +6,9 @@ jdk:
 script:
   - gradle check
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '7.2'
-}
+before_install:
+  - wget http://services.gradle.org/distributions/gradle-7.2-bin.zip
+  - unzip -qq gradle-7.2-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-7.2
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  - gradle -v
