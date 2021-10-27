@@ -5,7 +5,3 @@ jdk:
 
 script:
   - gradle check
-
-before_install:
-  - sdk install gradle 7.2
-  - gradle -v
