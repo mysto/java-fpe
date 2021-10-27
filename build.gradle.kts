@@ -1,5 +1,6 @@
 plugins {
     java
+    id("me.champeau.jmh") version "0.6.6"
 }
 
 group = "com.privacylogistics"
