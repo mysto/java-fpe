@@ -439,9 +439,9 @@ public class FF3Cipher {
             examples:
                encode_int_r(5)
                 '101'
-               encode_int_r(10, base=16)
+               encode_int_r(10, 16)
                 'A'
-               encode_int_r(32, base=16)
+               encode_int_r(32, 16)
                 '20'
          */
     protected static String encode_int_r(int n, int base, int length) {
