@@ -5,3 +5,7 @@ jdk:
 
 script:
   - gradle check
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '7.2'
+}
