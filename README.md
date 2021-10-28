@@ -35,7 +35,7 @@ To run the unit tests, including all test vectors from the NIST specification, r
 
 To run the performance tests:
 
-`gradle test`
+`gradle jmh`
 
 ## Usage
 
