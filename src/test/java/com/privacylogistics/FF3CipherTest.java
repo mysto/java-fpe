@@ -157,6 +157,14 @@ public class FF3CipherTest {
         Assert.assertEquals("a", reverseString(encode_int_r(10, 16, 1)));
         Assert.assertEquals("20", reverseString(encode_int_r(32, 16, 2)));
     }
+    @Test
+    public void testEncodeBigInt() throws Exception {
+        Assert.assertEquals("101", reverseString(encode_int_r(BigInteger.valueOf(5), 2, 3)));
+        Assert.assertEquals("11", reverseString(encode_int_r(BigInteger.valueOf(6), 5, 2)));
+        Assert.assertEquals("00012", reverseString(encode_int_r(BigInteger.valueOf(7), 5, 5)));
+        Assert.assertEquals("a", reverseString(encode_int_r(BigInteger.valueOf(10), 16, 1)));
+        Assert.assertEquals("20", reverseString(encode_int_r(BigInteger.valueOf(32), 16, 2)));
+    }
 
     @Test
     public void testDecodeInt() throws Exception {
