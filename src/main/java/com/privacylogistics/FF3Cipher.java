@@ -220,10 +220,7 @@ public class FF3Cipher {
 
             logger.info("\tm: {} A: {} c: {} y: {}", m, A, c, y);
 
-            // Convert c to sting using radix and length m
-            String C = c.toString(this.radix);
-            C = reverseString(C);
-            C = C + "00000000".substring(0, m - C.length());
+            String C = encode_int_r(c, this.radix, m);
 
             // Final steps
             A = B;
@@ -345,11 +342,8 @@ public class FF3Cipher {
             }
 
             logger.info("\tm: {} B: {} c: {} y: {}", m, B, c, y);
-
-            // Convert c to sting using radix and length m
-            String C = c.toString(this.radix);
-            C = reverseString(C);
-            C = C + "00000000".substring(0, m - C.length());
+            
+            String C = encode_int_r(c, this.radix, m);
 
             // Final steps
             B = A;
@@ -432,9 +426,11 @@ public class FF3Cipher {
         return sb.toString();
     }
 
-    /* Return a string representation of a number in the given base system for 2..62
-
-            The string is left in a reversed order expected by the calling cryptographic function
+    /*
+        Return a string representation of a number in the given base system for 2..62
+        - the string is right padded with zeros
+        - the string is returned in reversed order expected by the calling cryptographic function
+          i.e., the decimal value 123 in five decimal places would be '32100'
 
             examples:
                encode_int_r(5)
@@ -444,6 +440,30 @@ public class FF3Cipher {
                encode_int_r(32, 16)
                 '20'
          */
+    protected static String encode_int_r(BigInteger n, int base, int length) {
+
+        if (base > MAX_RADIX) {
+            throw new NumberFormatException(String.format("Base %d is not supported in the current radix 2..62", base));
+        }
+
+        char[] x = new char[length];
+        int i=0;
+
+        BigInteger bbase =  BigInteger.valueOf(base);
+        while (n.compareTo(bbase) >= 0) {
+            BigInteger b = n.mod(bbase);
+            n = n.divide(bbase);
+            x[i++] = BASE62[b.intValue()];
+        }
+        x[i++] = BASE62[n.intValue()];
+
+        // pad with zeros if necessary
+        while (i < length) {
+            x[i++] = '0';
+        }
+        return new String(x);
+    }
+
     protected static String encode_int_r(int n, int base, int length) {
 
         if (base > MAX_RADIX) {
@@ -457,7 +477,6 @@ public class FF3Cipher {
             x += BASE62[b];
         }
         x += BASE62[n];
-        System.out.println("ch: "+x);
         if (x.length() < length) {
             // left justify the string
             x = x + String.join("", Collections.nCopies(length-x.length(), "0"));
