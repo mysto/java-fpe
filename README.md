@@ -29,9 +29,13 @@ Build this project with gradle:
 Official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST,
 are used for testing in this package. Also included are draft ACVP test vectors with 56-bit tweaks.
 
-To run unit tests on this implementation, including all test vectors from the NIST specification, run the command:
+To run the unit tests, including all test vectors from the NIST specification, run the command:
 
-  `gradle test`
+`gradle test`
+
+To run the performance tests:
+
+`gradle test`
 
 ## Usage
 
