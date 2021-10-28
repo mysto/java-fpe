@@ -342,7 +342,7 @@ public class FF3Cipher {
             }
 
             logger.info("\tm: {} B: {} c: {} y: {}", m, B, c, y);
-            
+
             String C = encode_int_r(c, this.radix, m);
 
             // Final steps
@@ -462,26 +462,6 @@ public class FF3Cipher {
             x[i++] = '0';
         }
         return new String(x);
-    }
-
-    protected static String encode_int_r(int n, int base, int length) {
-
-        if (base > MAX_RADIX) {
-            throw new NumberFormatException(String.format("Base %d is not supported in the current radix 2..62", base));
-        }
-
-        String x = "";
-        while (n >= base) {
-            int b = n % base;
-            n = n / base;
-            x += BASE62[b];
-        }
-        x += BASE62[n];
-        if (x.length() < length) {
-            // left justify the string
-            x = x + String.join("", Collections.nCopies(length-x.length(), "0"));
-        }
-        return x;
     }
 
     protected static BigInteger decode_int_r(String str, int base) {
