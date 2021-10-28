@@ -4,7 +4,7 @@
 
 # ff3 - Format Preserving Encryption in Java
 
-An implementation of the NIST approved Format Preserving Encryption (FPE) FF3 and FF3-1 algorithms in Java.
+An implementation of the NIST approved FF3 and FF3-1 Format Preserving Encryption (FPE) algorithms in Java.
 
 This package follows the FF3 algorithm for Format Preserving Encryption as described in the March 2016 NIST publication 800-38G _Methods for Format-Preserving Encryption_, 
 and revised on February 28th, 2019 with a draft update for FF3-1.
@@ -12,9 +12,9 @@ and revised on February 28th, 2019 with a draft update for FF3-1.
 * [NIST Recommendation SP 800-38G (FF3)](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
 * [NIST Recommendation SP 800-38G Revision 1 (FF3-1)](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf)
 
-Changes to minimum domain size and revised tweak length have been implemented in this package.
-Tweaks can be 56 or 64 bits, but NIST has only published test vectors for 64-bit tweaks.  It is expected the final
-standard will provide updated test vectors necessary to standardize the tweak lengths to 56 bits.
+Changes to minimum domain size and revised tweak length have been implemented in this package with
+both 64-bit and 56-bit tweaks are supported. NIST has only published official test vectors for 64-bit tweaks, but draft ACVP test vectors have been used for testing FF3-1. It is expected the final
+NIST standard will provide updated test vectors with 56-bit tweak lengths.
 
 ## Requires
 
@@ -26,7 +26,8 @@ Build this project with gradle:
 
 `gradle build`
 
-There are official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST, which are used for testing in this package.
+Official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST,
+are used for testing in this package. Also included are draft ACVP test vectors with 56-bit tweaks.
 
 To run unit tests on this implementation, including all test vectors from the NIST specification, run the command:
 
@@ -51,7 +52,7 @@ Input plaintext has maximum length restrictions based upon the chosen radix (2 *
 To work around string length, its possible to encode longer text in chunks.
 
 As with any cryptographic package, managing and protecting the key(s) is crucial. The tweak is generally not kept secret.
-This package does not protect the key in memory.
+This package does not store the key in memory after initializing the cipher.
 
 ## Code Example
 
