@@ -33,6 +33,17 @@ To run the unit tests, including all test vectors from the NIST specification, r
 
 `gradle test`
 
+## Performance Benchmarks
+
+The Mysto FF3 was benchmarked on a MacBook Air (1.1 GHz Quad-Core Intel Core i5)
+performing 4,500 tokenization per second with random 8 character data input.
+
+To run the performance tests:
+
+```bash
+gradle jmh
+```
+
 To run the performance tests:
 
 `gradle jmh`
@@ -74,6 +85,21 @@ Using default domain [0-9]
     String plaintext = c.decrypt(ciphertext);
     pt;ciphertext;plaintext
 ```
+
+## Custom alphabets
+
+Custom alphabets up to 256 characters are supported. To use an alphabet consisting of the uppercase letters A-F (radix=6), we can continue
+from the above code example with:
+
+```java
+FF3Cipher c6 = new FF3Cipher(key, tweak, "ABCDEF");
+String plaintext = "DEADBEEF";
+String ciphertext = c6.encrypt(plaintext);
+String decrypted = c6.decrypt(ciphertext);
+
+System.out(String.format("{%s} -> {%s} -> {%s}", plaintext, ciphertext, decrypted);
+```
+
 
 ## The FF3 Algorithm
 

@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,10 +67,9 @@ public class FF3Cipher {
             throw new IllegalArgumentException("key length " + keyLen + " but must be 128, 192, or 256 bits");
         }
 
-        // While FF3 allows radices in [2, 2^16], there is a practical limit to 36 (alphanumeric)
-        // because Java BigInt only supports up to base 36.
+        // While FF3 allows radices in [2, 2^16], currenlty only tested up to 64
         if ((radix < 2) || (radix > MAX_RADIX)) {
-            throw new IllegalArgumentException("radix must be between 2 and 36, inclusive");
+            throw new IllegalArgumentException("radix must be between 2 and 64, inclusive");
         }
 
         // Make sure 2 <= minLength <= maxLength < 2*floor(log base radix of 2^96) is satisfied
@@ -123,13 +121,6 @@ public class FF3Cipher {
                     n, this.minLen, this.maxLen));
         }
 
-        // Check if the plaintext message is formatted in the current radix
-        try {
-            new BigInteger(plaintext, this.radix);
-        } catch (NumberFormatException ex) {
-            throw new NumberFormatException(String.format("The plaintext %s is not supported in the current radix %d", plaintext, this.radix));
-        }
-
         // Calculate split point
         int u = (int) Math.ceil(n / 2.0);
         int v = n - u;
@@ -139,7 +130,7 @@ public class FF3Cipher {
         String B = plaintext.substring(u);
         logger.info("r {} A {} B {}", this.radix, A, B);
 
-        // Split the tweak
+        // Calculate the tweak
         logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
 
         byte[] Tl;
@@ -164,7 +155,7 @@ public class FF3Cipher {
             Tr[3] &= 0x0F;
             Tr[3] = (byte) (Tr[3] << 4);
         } else {
-            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
+            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
                     this.tweakBytes.length));
         }
         // P is always 16 bytes
@@ -193,7 +184,7 @@ public class FF3Cipher {
             }
 
             // P is fixed-length 16 bytes
-            P = calculateP(i, this.radix, W, B);
+            P = calculateP(i, this.alphabet, W, B);
             reverseBytes(P);
 
             // Calculate S by operating on P in place
@@ -204,11 +195,7 @@ public class FF3Cipher {
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
             // Calculate c
-            try {
-                c = new BigInteger(reverseString(A), this.radix);
-            } catch (NumberFormatException ex) {
-                throw new RuntimeException("string A is not within base/radix");
-            }
+            c = decode_int(reverseString(A), alphabet);
 
             c = c.add(y);
 
@@ -220,7 +207,7 @@ public class FF3Cipher {
 
             logger.info("\tm: {} A: {} c: {} y: {}", m, A, c, y);
 
-            String C = encode_int_r(c, this.radix, m);
+            String C = encode_int_r(c, this.alphabet, m);
 
             // Final steps
             A = B;
@@ -247,11 +234,11 @@ public class FF3Cipher {
         }
 
         // Check if the ciphertext message is formatted in the current radix
-        try {
+        /*try {
             new BigInteger(ciphertext, this.radix);
         } catch (NumberFormatException ex) {
             throw new NumberFormatException(String.format("The plaintext is not supported in the current radix %d", this.radix));
-        }
+        }*/
 
         // Calculate split point
         int u = (int) Math.ceil(n / 2.0);
@@ -261,7 +248,7 @@ public class FF3Cipher {
         String A = ciphertext.substring(0, u);
         String B = ciphertext.substring(u);
 
-        // Split the tweak
+        // Calculate the tweak
         logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
 
         byte[] Tl;
@@ -316,7 +303,7 @@ public class FF3Cipher {
             }
 
             // P is fixed-length 16 bytes
-            P = calculateP(i, this.radix, W, A);
+            P = calculateP(i, this.alphabet, W, A);
             reverseBytes(P);
 
             // Calculate S by operating on P in place
@@ -327,11 +314,7 @@ public class FF3Cipher {
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
             // Calculate c
-            try {
-                c = new BigInteger(reverseString(B), this.radix);
-            } catch (NumberFormatException ex) {
-                throw new RuntimeException("string B is not within base/radix");
-            }
+            c = decode_int(reverseString(B), alphabet);
 
             c = c.subtract(y);
 
@@ -343,7 +326,7 @@ public class FF3Cipher {
 
             logger.info("\tm: {} B: {} c: {} y: {}", m, B, c, y);
 
-            String C = encode_int_r(c, this.radix, m);
+            String C = encode_int_r(c, this.alphabet, m);
 
             // Final steps
             B = A;
@@ -353,7 +336,7 @@ public class FF3Cipher {
         return A + B;
     }
 
-    protected static byte[] calculateP(int i, int radix, byte[] W, String B) {
+    protected static byte[] calculateP(int i, String alphabet, byte[] W, String B) {
 
         byte[] P = new byte[BLOCK_SIZE];     // P is always 16 bytes, zero initialized
 
@@ -369,7 +352,7 @@ public class FF3Cipher {
         // The remaining 12 bytes of P are copied from reverse(B) with padding
 
         B = reverseString(B);
-        byte[] bBytes = new BigInteger(B, radix).toByteArray();
+        byte[] bBytes = decode_int(B, alphabet).toByteArray();
 
         System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
         logger.info("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
@@ -433,48 +416,45 @@ public class FF3Cipher {
           i.e., the decimal value 123 in five decimal places would be '32100'
 
             examples:
-               encode_int_r(5)
+               encode_int_r(5,10,3)
                 '101'
-               encode_int_r(10, 16)
+               encode_int_r(10, 16,1)
                 'A'
-               encode_int_r(32, 16)
-                '20'
+               encode_int_r(32, 16,2)
+                '2000'
+               encode_int_r(32, 16,4)
+                '2000'
          */
-    protected static String encode_int_r(BigInteger n, int base, int length) {
-
-        if (base > MAX_RADIX) {
-            throw new NumberFormatException(String.format("Base %d is not supported in the current radix 2..62", base));
-        }
+    protected static String encode_int_r(BigInteger n, String alphabet, int length) {
 
         char[] x = new char[length];
         int i=0;
 
-        BigInteger bbase =  BigInteger.valueOf(base);
+        BigInteger bbase =  BigInteger.valueOf(alphabet.length());
         while (n.compareTo(bbase) >= 0) {
             BigInteger b = n.mod(bbase);
             n = n.divide(bbase);
-            x[i++] = BASE62[b.intValue()];
+            x[i++] = alphabet.charAt(b.intValue());
         }
-        x[i++] = BASE62[n.intValue()];
+        x[i++] = alphabet.charAt(n.intValue());
 
-        // pad with zeros if necessary
+        // pad with zeros-index value if necessary
         while (i < length) {
-            x[i++] = '0';
+            x[i++] = alphabet.charAt(0);
         }
         return new String(x);
     }
 
-    protected static BigInteger decode_int_r(String str, int base) {
-
-        /* Decode a Base X encoded string into the number */
+    protected static BigInteger decode_int(String str, String alphabet) {
+        // Decode a base X string representation into a number
 
         int strlen = str.length();
+        BigInteger base = BigInteger.valueOf(alphabet.length());
         BigInteger num = BigInteger.ZERO;
         int idx =0;
-        // Todo: iterate with -1 steps
-        for (char each : reverseString(str).toCharArray()) {
-            int power = (strlen - (idx + 1));
-            num = num.add(BigInteger.valueOf(BASE62STR.indexOf(each) * (long) (Math.pow(base, power))));
+        for (char each : str.toCharArray()) {
+            int exponent = (strlen - (idx + 1));
+            num = num.add(base.pow(exponent).multiply(BigInteger.valueOf(alphabet.indexOf(each))));
             idx += 1;
         }
         return num;
@@ -483,13 +463,13 @@ public class FF3Cipher {
     protected static String alphabetForBase(int base) {
         switch (base) {
             case 10:
-                return "0123456789";
+                return DIGITS;
             case 26:
-                return "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                return ASCII_UPPERCASE;
             case 36:
-                return "0123456789" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                return DIGITS + ASCII_UPPERCASE;
             case 64:
-                return "0123456789" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz";
+                return DIGITS + ASCII_UPPERCASE + ASCII_LOWERCASE;
             default:
                 throw new RuntimeException("Unsupported radix");
         }
@@ -503,9 +483,12 @@ public class FF3Cipher {
     public static int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
     public static int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
     public static int HALF_TWEAK_LEN = TWEAK_LEN/2;
-    public static int MAX_RADIX =    36;      // Java BigInteger supports radix 2..36
+    public static int MAX_RADIX =    256;
     public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
-    public static String BASE62STR = ("0123456789" + "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    public static String DIGITS = ("0123456789");
+    public static String ASCII_LOWERCASE = ("abcdefghijklmnopqrstuvwxyz");
+    public static String ASCII_UPPERCASE = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    public static String BASE62STR = (DIGITS + ASCII_LOWERCASE + ASCII_UPPERCASE);
     public static char[] BASE62 = BASE62STR.toCharArray();
 
     private final int radix;
