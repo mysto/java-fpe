@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.com/mysto/java-fpe.svg?branch=main)](https://travis-ci.com/mysto/java-fpe)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Downloads](https://pepy.tech/badge/ff3)](https://pepy.tech/project/ff3)
 
 # ff3 - Format Preserving Encryption in Java
 
