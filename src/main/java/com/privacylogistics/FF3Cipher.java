@@ -396,6 +396,9 @@ public class FF3Cipher {
         return sb.toString();
     }
 
+    /*
+     * used for debugging
+     */
     protected static String byteArrayToIntString(byte[] byteArray) {
 
         StringBuilder sb = new StringBuilder();
@@ -465,7 +468,8 @@ public class FF3Cipher {
             case 10:
                 return DIGITS;
             case 26:
-                return ASCII_UPPERCASE;
+                // used by NIST test vectors
+                return DIGITS + "abcdefghijklmnop";
             case 36:
                 return DIGITS + ASCII_UPPERCASE;
             case 64:

@@ -170,7 +170,7 @@ public class FF3CipherTest {
         Assert.assertEquals(new BigInteger("2658354847544284194395037922"), (decode_int("2658354847544284194395037922", "0123456789")));
     }
 
-    //@Test
+    @Test
     public void testNistFF3() throws Exception {
         // NIST FF3-AES 128, 192, 256
         for( String[] testVector : TestVectors) {
