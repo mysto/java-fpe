@@ -141,23 +141,14 @@ public class FF3Cipher {
             Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
         } else if (this.tweakBytes.length == TWEAK_LEN_NEW)  {
             // FF3-1
-            // The tweak is partitioned into a 32-bit left tweak and a 32-bit right tweak
-            // Tl is T[0..27] + 0000
-            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
-            Tl[3] &= 0xF0;
-
-            // Tr is T[32..55] + T[28..31] + 0000
-            Tr = new byte[HALF_TWEAK_LEN];
-            Tr[0] = this.tweakBytes[HALF_TWEAK_LEN];
-            Tr[1] = this.tweakBytes[HALF_TWEAK_LEN+1];
-            Tr[2] = this.tweakBytes[HALF_TWEAK_LEN+2];
-            Tr[3] = this.tweakBytes[3];
-            Tr[3] &= 0x0F;
-            Tr[3] = (byte) (Tr[3] << 4);
+            byte[] tweak64 = calculateTweak64_FF3_1(this.tweakBytes);
+            Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
+            Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
         } else {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
                     this.tweakBytes.length));
         }
+
         // P is always 16 bytes
         byte[] P;
 
@@ -259,19 +250,9 @@ public class FF3Cipher {
             Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
         } else if (this.tweakBytes.length == TWEAK_LEN_NEW)  {
             // FF3-1
-            // The tweak is partitioned into a 32-bit left tweak and a 32-bit right tweak
-            // Tl is T[0..27] + 0000
-            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
-            Tl[3] &= 0xF0;
-
-            // Tr is T[32..55] + T[28..31] + 0000
-            Tr = new byte[HALF_TWEAK_LEN];
-            Tr[0] = this.tweakBytes[HALF_TWEAK_LEN];
-            Tr[1] = this.tweakBytes[HALF_TWEAK_LEN+1];
-            Tr[2] = this.tweakBytes[HALF_TWEAK_LEN+2];
-            Tr[3] = this.tweakBytes[3];
-            Tr[3] &= 0x0F;
-            Tr[3] = (byte) (Tr[3] << 4);
+            byte[] tweak64 = calculateTweak64_FF3_1(this.tweakBytes);
+            Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
+            Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
         } else {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
                     this.tweakBytes.length));
@@ -334,6 +315,21 @@ public class FF3Cipher {
             logger.info("A: {} B: {}", A, B);
         }
         return A + B;
+    }
+
+    protected static byte[] calculateTweak64_FF3_1(byte[] tweak56)
+    {
+        byte[] tweak64 = new byte[8];
+        tweak64[0] = tweak56[0];
+        tweak64[1] = tweak56[1];
+        tweak64[2] = tweak56[2];
+        tweak64[3] = (byte)(tweak56[3] & 0xF0);
+        tweak64[4] = tweak56[4];
+        tweak64[5] = tweak56[5];
+        tweak64[6] = tweak56[6];
+        tweak64[7] = (byte)((tweak56[3] & 0x0F) << 4);
+
+        return tweak64;
     }
 
     protected static byte[] calculateP(int i, String alphabet, byte[] W, String B) {
@@ -492,8 +488,6 @@ public class FF3Cipher {
     public static String DIGITS = ("0123456789");
     public static String ASCII_LOWERCASE = ("abcdefghijklmnopqrstuvwxyz");
     public static String ASCII_UPPERCASE = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    public static String BASE62STR = (DIGITS + ASCII_LOWERCASE + ASCII_UPPERCASE);
-    public static char[] BASE62 = BASE62STR.toCharArray();
 
     private final int radix;
     private final String alphabet;
