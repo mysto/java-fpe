@@ -224,13 +224,6 @@ public class FF3Cipher {
                     n, this.minLen, this.maxLen));
         }
 
-        // Check if the ciphertext message is formatted in the current radix
-        /*try {
-            new BigInteger(ciphertext, this.radix);
-        } catch (NumberFormatException ex) {
-            throw new NumberFormatException(String.format("The plaintext is not supported in the current radix %d", this.radix));
-        }*/
-
         // Calculate split point
         int u = (int) Math.ceil(n / 2.0);
         int v = n - u;
