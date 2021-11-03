@@ -213,4 +213,37 @@ public class FF3CipherTest {
         Assert.assertEquals(ct, ciphertext);
         Assert.assertEquals(pt, plaintext);
     }
+
+    @Test
+    public void testCustomAlphabet() throws Exception {
+        // Check the first NIST 128-bit test vector using superscript characters
+        String alphabet = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+        String key = "EF4359D8D580AA4F7F036D6F04FC6A94";
+        String tweak = "D8E7920AFA330A";
+        String pt = "⁸⁹⁰¹²¹²³⁴⁵⁶⁷⁸⁹⁰⁰⁰⁰";
+        String ct = "⁷⁵⁰⁹¹⁸⁸¹⁴⁰⁵⁸⁶⁵⁴⁶⁰⁷";
+        FF3Cipher c = new FF3Cipher(key, tweak, alphabet);
+        String ciphertext = c.encrypt(pt);
+        Assert.assertEquals(ct, ciphertext) ;
+        String plaintext = c.decrypt(ciphertext);
+        Assert.assertEquals(pt, plaintext);
+    }
+
+    @Test
+    public void testGermanAlphabet() throws Exception {
+        // Test the German alphabet which consists of the latin alphabet plus four
+        // additional letters, each of which have uppercase and lowercase letters
+        // Thus the radix is 70.
+
+        String german_alphabet = FF3Cipher.DIGITS + FF3Cipher.ASCII_LOWERCASE + FF3Cipher.ASCII_UPPERCASE + "ÄäÖöÜüẞß";
+        String key = "EF4359D8D580AA4F7F036D6F04FC6A94";
+        String tweak = "D8E7920AFA330A";
+        String pt = "liebeGrüße";
+        String ct = "5kÖQbairXo";
+        FF3Cipher c = new FF3Cipher(key, tweak, german_alphabet);
+        String ciphertext = c.encrypt(pt);
+        Assert.assertEquals(ct, ciphertext);
+        String plaintext = c.decrypt(ciphertext);
+        Assert.assertEquals(pt, plaintext);
+    }
 }
