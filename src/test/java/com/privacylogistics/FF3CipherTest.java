@@ -1,6 +1,6 @@
 package com.privacylogistics;
 
-/**
+/*
  * Format-Preserving Encryption for FF3
  *
  * Copyright (c) 2021 Schoening Consulting LLC
@@ -116,7 +116,7 @@ public class FF3CipherTest {
     };
 
     @Test
-    public void testCreate() throws Exception {
+    public void testCreate() {
         FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
         Assert.assertNotNull(c);
     }
@@ -134,7 +134,7 @@ public class FF3CipherTest {
     @Test
     public void testCalculateP() {
         // NIST Sample #1, round 0
-        int i = 0, radix = 10;
+        int i = 0;
         String alphabet = "0123456789";
         String B = "567890000";
         byte[] W = FF3Cipher.hexStringToByteArray("FA330A73");
@@ -152,7 +152,7 @@ public class FF3CipherTest {
     }*/
 
     @Test
-    public void testEncodeBigInt() throws Exception {
+    public void testEncodeBigInt() {
         Assert.assertEquals("101", reverseString(encode_int_r(BigInteger.valueOf(5), "01", 3)));
         Assert.assertEquals("11", reverseString(encode_int_r(BigInteger.valueOf(6), "01234", 2)));
         Assert.assertEquals("00012", reverseString(encode_int_r(BigInteger.valueOf(7), "01234", 5)));
@@ -161,7 +161,7 @@ public class FF3CipherTest {
     }
 
     @Test
-    public void testDecodeInt() throws Exception {
+    public void testDecodeInt() {
         Assert.assertEquals(BigInteger.valueOf(321), (decode_int("321", "0123456789")));
         Assert.assertEquals(BigInteger.valueOf(101), (decode_int("101", "0123456789")));
         Assert.assertEquals(BigInteger.valueOf(101), (decode_int("00101", "0123456789")));
@@ -174,7 +174,7 @@ public class FF3CipherTest {
     public void testNistFF3() throws Exception {
         // NIST FF3-AES 128, 192, 256
         for( String[] testVector : TestVectors) {
-            FF3Cipher c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], Integer.valueOf(testVector[Tradix]));
+            FF3Cipher c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], Integer.parseInt(testVector[Tradix]));
             String pt = testVector[Tplaintext], ct = testVector[Tciphertext];
             String ciphertext = c.encrypt(pt);
             String plaintext = c.decrypt(ciphertext);
@@ -187,7 +187,7 @@ public class FF3CipherTest {
     public void testAcvpFF3_1() throws Exception {
         // ACVP FF3-AES 128, 192, 256
         for( String[] testVector : TestVectors_ACVP_AES_FF3_1) {
-            int radix = Integer.valueOf(testVector[Uradix]);
+            int radix = Integer.parseInt(testVector[Uradix]);
             FF3Cipher c;
             if (radix == 10) {
                 c = new FF3Cipher(testVector[Ukey], testVector[Utweak], radix);
@@ -204,9 +204,9 @@ public class FF3CipherTest {
 
     @Test
     public void testFF3_1() throws Exception {
-        // Experimental test with 56 bit tweak
+        // Test with 56 bit tweak
         String[] testVector = TestVectors[0];
-        FF3Cipher c = new FF3Cipher(testVector[Tkey], "D8E7920AFA330A", Integer.valueOf(testVector[Tradix]));
+        FF3Cipher c = new FF3Cipher(testVector[Tkey], "D8E7920AFA330A", Integer.parseInt(testVector[Tradix]));
         String pt = testVector[Tplaintext], ct = "477064185124354662";
         String ciphertext = c.encrypt(pt);
         String plaintext = c.decrypt(ciphertext);
@@ -219,7 +219,7 @@ public class FF3CipherTest {
         // Check the first NIST 128-bit test vector using superscript characters
         String alphabet = "⁰¹²³⁴⁵⁶⁷⁸⁹";
         String key = "EF4359D8D580AA4F7F036D6F04FC6A94";
-        String tweak = "D8E7920AFA330A";
+        String tweak = "D8E7920AFA330A73";
         String pt = "⁸⁹⁰¹²¹²³⁴⁵⁶⁷⁸⁹⁰⁰⁰⁰";
         String ct = "⁷⁵⁰⁹¹⁸⁸¹⁴⁰⁵⁸⁶⁵⁴⁶⁰⁷";
         FF3Cipher c = new FF3Cipher(key, tweak, alphabet);
@@ -231,13 +231,12 @@ public class FF3CipherTest {
 
     @Test
     public void testGermanAlphabet() throws Exception {
-        // Test the German alphabet which consists of the latin alphabet plus four
-        // additional letters, each of which have uppercase and lowercase letters
-        // Thus the radix is 70.
+        // Test the German alphabet with a radix of 70.  German consists of the latin alphabet
+        // plus four additional letters, each of which have uppercase and lowercase letters
 
         String german_alphabet = FF3Cipher.DIGITS + FF3Cipher.ASCII_LOWERCASE + FF3Cipher.ASCII_UPPERCASE + "ÄäÖöÜüẞß";
         String key = "EF4359D8D580AA4F7F036D6F04FC6A94";
-        String tweak = "D8E7920AFA330A";
+        String tweak = "D8E7920AFA330A73";
         String pt = "liebeGrüße";
         String ct = "5kÖQbairXo";
         FF3Cipher c = new FF3Cipher(key, tweak, german_alphabet);
