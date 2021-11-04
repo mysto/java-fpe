@@ -1,4 +1,5 @@
 language: java
+os: freebsd
 
 jdk:
   - openjdk8
