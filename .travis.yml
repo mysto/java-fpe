@@ -1,8 +1,6 @@
 language: java
 os: freebsd
 
-jdk:
-  - openjdk8
 
 script:
   - gradle check
