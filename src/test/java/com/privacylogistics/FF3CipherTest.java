@@ -17,8 +17,11 @@ package com.privacylogistics;
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.condition.JRE;
+
 import java.math.BigInteger;
 
 import static com.privacylogistics.FF3Cipher.reverseString;
@@ -118,7 +121,7 @@ public class FF3CipherTest {
     @Test
     public void testCreate() {
         FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
-        Assert.assertNotNull(c);
+        assertNotNull(c);
     }
 
     @Test
@@ -126,9 +129,9 @@ public class FF3CipherTest {
         String hexstr = "BADA55";
         byte[] bytestr = {(byte) 0xba, (byte) 0xda, (byte) 0x55};
         byte[] hex = FF3Cipher.hexStringToByteArray(hexstr);
-        Assert.assertArrayEquals(hex, bytestr);
+        assertArrayEquals(hex, bytestr);
         String str = FF3Cipher.byteArrayToHexString(hex);
-        Assert.assertEquals(hexstr, str);
+        assertEquals(hexstr, str);
     }
 
     @Test
@@ -139,7 +142,7 @@ public class FF3CipherTest {
         String B = "567890000";
         byte[] W = FF3Cipher.hexStringToByteArray("FA330A73");
         byte[] P = FF3Cipher.calculateP(i, alphabet, W, B);
-        Assert.assertArrayEquals(P, new byte[]
+        assertArrayEquals(P, new byte[]
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
     }
 
@@ -153,21 +156,21 @@ public class FF3CipherTest {
 
     @Test
     public void testEncodeBigInt() {
-        Assert.assertEquals("101", reverseString(encode_int_r(BigInteger.valueOf(5), "01", 3)));
-        Assert.assertEquals("11", reverseString(encode_int_r(BigInteger.valueOf(6), "01234", 2)));
-        Assert.assertEquals("00012", reverseString(encode_int_r(BigInteger.valueOf(7), "01234", 5)));
-        Assert.assertEquals("a", reverseString(encode_int_r(BigInteger.valueOf(10), "0123456789abcdef", 1)));
-        Assert.assertEquals("20", reverseString(encode_int_r(BigInteger.valueOf(32), "0123456789abcdef", 2)));
+        assertEquals("101", reverseString(encode_int_r(BigInteger.valueOf(5), "01", 3)));
+        assertEquals("11", reverseString(encode_int_r(BigInteger.valueOf(6), "01234", 2)));
+        assertEquals("00012", reverseString(encode_int_r(BigInteger.valueOf(7), "01234", 5)));
+        assertEquals("a", reverseString(encode_int_r(BigInteger.valueOf(10), "0123456789abcdef", 1)));
+        assertEquals("20", reverseString(encode_int_r(BigInteger.valueOf(32), "0123456789abcdef", 2)));
     }
 
     @Test
     public void testDecodeInt() {
-        Assert.assertEquals(BigInteger.valueOf(321), (decode_int("321", "0123456789")));
-        Assert.assertEquals(BigInteger.valueOf(101), (decode_int("101", "0123456789")));
-        Assert.assertEquals(BigInteger.valueOf(101), (decode_int("00101", "0123456789")));
-        Assert.assertEquals(BigInteger.valueOf(0x02), (decode_int("02", "0123456789abcdef")));
-        Assert.assertEquals(BigInteger.valueOf(0xAA), (decode_int("aa", "0123456789abcdef")));
-        Assert.assertEquals(new BigInteger("2658354847544284194395037922"), (decode_int("2658354847544284194395037922", "0123456789")));
+        assertEquals(BigInteger.valueOf(321), (decode_int("321", "0123456789")));
+        assertEquals(BigInteger.valueOf(101), (decode_int("101", "0123456789")));
+        assertEquals(BigInteger.valueOf(101), (decode_int("00101", "0123456789")));
+        assertEquals(BigInteger.valueOf(0x02), (decode_int("02", "0123456789abcdef")));
+        assertEquals(BigInteger.valueOf(0xAA), (decode_int("aa", "0123456789abcdef")));
+        assertEquals(new BigInteger("2658354847544284194395037922"), (decode_int("2658354847544284194395037922", "0123456789")));
     }
 
     @Test
@@ -178,8 +181,8 @@ public class FF3CipherTest {
             String pt = testVector[Tplaintext], ct = testVector[Tciphertext];
             String ciphertext = c.encrypt(pt);
             String plaintext = c.decrypt(ciphertext);
-            Assert.assertEquals(ct, ciphertext);
-            Assert.assertEquals(pt, plaintext);
+            assertEquals(ct, ciphertext);
+            assertEquals(pt, plaintext);
         }
     }
 
@@ -197,8 +200,8 @@ public class FF3CipherTest {
             String pt = testVector[Uplaintext], ct = testVector[Uciphertext];
             String ciphertext = c.encrypt(pt);
             String plaintext = c.decrypt(ciphertext);
-            Assert.assertEquals(ct, ciphertext);
-            Assert.assertEquals(pt, plaintext);
+            assertEquals(ct, ciphertext);
+            assertEquals(pt, plaintext);
         }
     }
 
@@ -210,11 +213,12 @@ public class FF3CipherTest {
         String pt = testVector[Tplaintext], ct = "477064185124354662";
         String ciphertext = c.encrypt(pt);
         String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(ct, ciphertext);
-        Assert.assertEquals(pt, plaintext);
+        assertEquals(ct, ciphertext);
+        assertEquals(pt, plaintext);
     }
 
     @Test
+    @EnabledOnJre(value = JRE.JAVA_11)
     public void testCustomAlphabet() throws Exception {
         // Check the first NIST 128-bit test vector using superscript characters
         String alphabet = "⁰¹²³⁴⁵⁶⁷⁸⁹";
@@ -224,9 +228,9 @@ public class FF3CipherTest {
         String ct = "⁷⁵⁰⁹¹⁸⁸¹⁴⁰⁵⁸⁶⁵⁴⁶⁰⁷";
         FF3Cipher c = new FF3Cipher(key, tweak, alphabet);
         String ciphertext = c.encrypt(pt);
-        Assert.assertEquals(ct, ciphertext) ;
+        assertEquals(ct, ciphertext) ;
         String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(pt, plaintext);
+        assertEquals(pt, plaintext);
     }
 
     @Test
@@ -241,8 +245,8 @@ public class FF3CipherTest {
         String ct = "5kÖQbairXo";
         FF3Cipher c = new FF3Cipher(key, tweak, german_alphabet);
         String ciphertext = c.encrypt(pt);
-        Assert.assertEquals(ct, ciphertext);
+        assertEquals(ct, ciphertext);
         String plaintext = c.decrypt(ciphertext);
-        Assert.assertEquals(pt, plaintext);
+        assertEquals(pt, plaintext);
     }
 }

@@ -12,7 +12,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation("junit", "junit", "4.12")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")
     implementation("org.apache.logging.log4j:log4j-api:2.1")
 }
 
