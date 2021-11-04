@@ -19,6 +19,7 @@ dependencies {
 group = "io.github.mysto"
 version = "0.9"
 
+/*
 java {
     withJavadocJar()
     withSourcesJar()
@@ -86,4 +87,4 @@ tasks.javadoc {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
     }
 }
-
+*/
