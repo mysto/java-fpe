@@ -128,10 +128,10 @@ public class FF3Cipher {
         // Split the message
         String A = plaintext.substring(0, u);
         String B = plaintext.substring(u);
-        logger.info("r {} A {} B {}", this.radix, A, B);
+        logger.trace("r {} A {} B {}", this.radix, A, B);
 
         // Calculate the tweak
-        logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
+        logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
 
         byte[] Tl;
         byte[] Tr;
@@ -157,8 +157,8 @@ public class FF3Cipher {
 
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
-        logger.info("u {} v {} modU: {} modV: {}", u, v, modU, modV);
-        logger.info("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
+        logger.trace("u {} v {} modU: {} modV: {}", u, v, modU, modV);
+        logger.trace("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
 
         for (byte i = 0; i < NUM_ROUNDS; ++i) {
             int m;
@@ -181,7 +181,7 @@ public class FF3Cipher {
             // Calculate S by operating on P in place
             byte[] S = this.aesCipher.doFinal(P);
             reverseBytes(S);
-            logger.info("\tS: {}", byteArrayToHexString(S));
+            logger.trace("\tS: {}", byteArrayToHexString(S));
 
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
@@ -196,14 +196,14 @@ public class FF3Cipher {
                 c = c.mod(modV);
             }
 
-            logger.info("\tm: {} A: {} c: {} y: {}", m, A, c, y);
+            logger.trace("\tm: {} A: {} c: {} y: {}", m, A, c, y);
 
             String C = encode_int_r(c, this.alphabet, m);
 
             // Final steps
             A = B;
             B = C;
-            logger.info("A: {} B: {}", A, B);
+            logger.trace("A: {} B: {}", A, B);
         }
         return A + B;
     }
@@ -233,7 +233,7 @@ public class FF3Cipher {
         String B = ciphertext.substring(u);
 
         // Calculate the tweak
-        logger.info("tweak: {}", byteArrayToHexString(this.tweakBytes));
+        logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
 
         byte[] Tl;
         byte[] Tr;
@@ -259,8 +259,8 @@ public class FF3Cipher {
 
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
-        logger.info("modU: {} modV: {}", modU, modV);
-        logger.info("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
+        logger.trace("modU: {} modV: {}", modU, modV);
+        logger.trace("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
 
         for (byte i = (byte) (NUM_ROUNDS - 1); i >= 0; --i) {
             int m;
@@ -283,7 +283,7 @@ public class FF3Cipher {
             // Calculate S by operating on P in place
             byte[] S = this.aesCipher.doFinal(P);
             reverseBytes(S);
-            logger.info("\tS: {}", byteArrayToHexString(S));
+            logger.trace("\tS: {}", byteArrayToHexString(S));
 
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
@@ -298,14 +298,14 @@ public class FF3Cipher {
                 c = c.mod(modV);
             }
 
-            logger.info("\tm: {} B: {} c: {} y: {}", m, B, c, y);
+            logger.trace("\tm: {} B: {} c: {} y: {}", m, B, c, y);
 
             String C = encode_int_r(c, this.alphabet, m);
 
             // Final steps
             B = A;
             A = C;
-            logger.info("A: {} B: {}", A, B);
+            logger.trace("A: {} B: {}", A, B);
         }
         return A + B;
     }
@@ -344,7 +344,7 @@ public class FF3Cipher {
         byte[] bBytes = decode_int(B, alphabet).toByteArray();
 
         System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
-        logger.info("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
+        logger.trace("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
         return P;
     }
 
