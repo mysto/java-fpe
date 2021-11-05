@@ -67,7 +67,7 @@ public class FF3Cipher {
             throw new IllegalArgumentException("key length " + keyLen + " but must be 128, 192, or 256 bits");
         }
 
-        // While FF3 allows radices in [2, 2^16], currenlty only tested up to 64
+        // While FF3 allows radices in [2, 2^16], currently only tested up to 64
         if ((radix < 2) || (radix > MAX_RADIX)) {
             throw new IllegalArgumentException("radix must be between 2 and 64, inclusive");
         }
@@ -130,30 +130,25 @@ public class FF3Cipher {
         String B = plaintext.substring(u);
         logger.trace("r {} A {} B {}", this.radix, A, B);
 
-        // Calculate the tweak
-        logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
-
-        byte[] Tl;
-        byte[] Tr;
-        if (this.tweakBytes.length == TWEAK_LEN) {
-            // FF3
-            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
-            Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
-        } else if (this.tweakBytes.length == TWEAK_LEN_NEW)  {
-            // FF3-1
-            byte[] tweak64 = calculateTweak64_FF3_1(this.tweakBytes);
-            Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
-            Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
-        } else {
+        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length == TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
                     this.tweakBytes.length));
         }
+
+        // Calculate the tweak
+        logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
+
+        byte[] tweak64 = (this.tweakBytes.length == TWEAK_LEN_NEW) ?
+                calculateTweak64_FF3_1(this.tweakBytes) : this.tweakBytes;
+
+        byte[] Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
+        byte[] Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
 
         // P is always 16 bytes
         byte[] P;
 
         // Pre-calculate the modulus since it's only one of 2 values,
-        // depending on whether i is even or odd
+        // depending on whether it is even or odd
 
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
@@ -232,30 +227,25 @@ public class FF3Cipher {
         String A = ciphertext.substring(0, u);
         String B = ciphertext.substring(u);
 
+        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length == TWEAK_LEN_NEW)) {
+            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
+                    this.tweakBytes.length));
+        }
+
         // Calculate the tweak
         logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
 
-        byte[] Tl;
-        byte[] Tr;
-        if (this.tweakBytes.length == TWEAK_LEN) {
-            // FF3
-            Tl = Arrays.copyOf(this.tweakBytes, HALF_TWEAK_LEN);
-            Tr = Arrays.copyOfRange(this.tweakBytes, HALF_TWEAK_LEN, TWEAK_LEN);
-        } else if (this.tweakBytes.length == TWEAK_LEN_NEW)  {
-            // FF3-1
-            byte[] tweak64 = calculateTweak64_FF3_1(this.tweakBytes);
-            Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
-            Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
-        } else {
-            throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 8 bytes, or 64 bits",
-                    this.tweakBytes.length));
-        }
+        byte[] tweak64 = (this.tweakBytes.length == TWEAK_LEN_NEW) ?
+                calculateTweak64_FF3_1(this.tweakBytes) : this.tweakBytes;
+
+        byte[] Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
+        byte[] Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
 
         // P is always 16 bytes
         byte[] P;
 
         // Pre-calculate the modulus since it's only one of 2 values,
-        // depending on whether i is even or odd
+        // depending on whether it is even or odd
 
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
@@ -330,7 +320,7 @@ public class FF3Cipher {
         byte[] P = new byte[BLOCK_SIZE];     // P is always 16 bytes, zero initialized
 
         // Calculate P by XORing W, i into the first 4 bytes of P
-        // i only requires 1 byte, rest are 0 padding bytes
+        // it only requires 1 byte, rest are 0 padding bytes
         // Anything XOR 0 is itself, so only need to XOR the last byte
 
         P[0] = W[0];
