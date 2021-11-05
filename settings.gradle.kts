@@ -1,2 +1,2 @@
-rootProject.name = "java-fpe"
+rootProject.name = "ff3"
 
