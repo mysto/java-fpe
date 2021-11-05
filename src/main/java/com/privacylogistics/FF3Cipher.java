@@ -11,9 +11,9 @@ package com.privacylogistics;
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied.
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
@@ -69,7 +69,7 @@ public class FF3Cipher {
 
         // While FF3 allows radices in [2, 2^16], currently only tested up to 64
         if ((radix < 2) || (radix > MAX_RADIX)) {
-            throw new IllegalArgumentException("radix must be between 2 and 64, inclusive");
+            throw new IllegalArgumentException("radix must be between 2 and 256, inclusive");
         }
 
         // Make sure 2 <= minLength <= maxLength < 2*floor(log base radix of 2^96) is satisfied
@@ -105,13 +105,18 @@ public class FF3Cipher {
         this(key, tweak, alphabetForBase(radix));
     }
 
-        /* convenience method to override tweak */
+    /** convenience method to override tweak */
     @SuppressWarnings("unused")
     public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
         return encrypt(plaintext);
     }
 
+    /**
+     * Encrypt a value
+     * @param plaintext   a plaintext to encrypt
+     * @return            the ciphertext
+     * */
     public String encrypt(String plaintext) throws BadPaddingException, IllegalBlockSizeException {
         int n = plaintext.length();
 
@@ -203,13 +208,18 @@ public class FF3Cipher {
         return A + B;
     }
 
-    /* convenience method to override tweak */
+    /** convenience method to override tweak */
     @SuppressWarnings("unused")
     public String decrypt(String ciphertext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
         return decrypt(ciphertext);
     }
 
+    /**
+     * Decrypt a value
+     * @param ciphertext   a ciphertext to decrypt
+     * @return             the plaintext
+     * */
     public String decrypt(String ciphertext) throws BadPaddingException, IllegalBlockSizeException {
         int n = ciphertext.length();
 
@@ -300,6 +310,9 @@ public class FF3Cipher {
         return A + B;
     }
 
+    /**
+     * For FF3-1, calculate a 64-bit tweak by transforming a 56-bit tweak
+     */
     protected static byte[] calculateTweak64_FF3_1(byte[] tweak56)
     {
         byte[] tweak64 = new byte[8];
@@ -342,7 +355,7 @@ public class FF3Cipher {
         return new StringBuilder(s).reverse().toString();
     }
 
-    /*
+    /**
      * Reverse a byte array in-place
      */
     protected void reverseBytes(byte[] b) {
@@ -361,7 +374,7 @@ public class FF3Cipher {
         return data;
     }
 
-    /*
+    /**
      * used for debugging
      * Java 17 has java.util.HexFormat
      */
@@ -375,7 +388,7 @@ public class FF3Cipher {
         return sb.toString();
     }
 
-    /*
+    /**
      * used for debugging
      */
     protected static String byteArrayToIntString(byte[] byteArray) {
@@ -391,22 +404,16 @@ public class FF3Cipher {
         return sb.toString();
     }
 
-    /*
-        Return a string representation of a number in the given base system for 2..62
-        - the string is right padded with zeros
-        - the string is returned in reversed order expected by the calling cryptographic function
-          i.e., the decimal value 123 in five decimal places would be '32100'
-
-            examples:
-               encode_int_r(5,10,3)
-                '101'
-               encode_int_r(10, 16,1)
-                'A'
-               encode_int_r(32, 16,2)
-                '2000'
-               encode_int_r(32, 16,4)
-                '2000'
-         */
+    /**
+     * Return a string representation of a number in the given base system
+     * - the string is right padded with zeros to length
+     * - the string is returned in reversed order expected by the calling cryptographic function
+     * i.e., the decimal value 123 in five decimal places would be '32100'
+     *
+     *      examples:
+     *         encode_int_r(10, 16,2)
+     *          'A0'
+     */
     protected static String encode_int_r(BigInteger n, String alphabet, int length) {
 
         char[] x = new char[length];
@@ -427,8 +434,11 @@ public class FF3Cipher {
         return new String(x);
     }
 
+    /**
+     * Decode a base X string representation into a number
+     */
     protected static BigInteger decode_int(String str, String alphabet) {
-        // Decode a base X string representation into a number
+
 
         int strlen = str.length();
         BigInteger base = BigInteger.valueOf(alphabet.length());
@@ -458,16 +468,17 @@ public class FF3Cipher {
         }
     }
 
+    private static int NUM_ROUNDS =   8;
+    private static int BLOCK_SIZE =   16;      // aes.BlockSize
+    private static int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
+    private static int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
+    private static int HALF_TWEAK_LEN = TWEAK_LEN/2;
+    private static int MAX_RADIX =    256;
+    private static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
+
     // The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
     // the minimum domain size for FF1 and FF3-1 is one million.
     public static int DOMAIN_MIN =  1000000;  // 1M
-    public static int NUM_ROUNDS =   8;
-    public static int BLOCK_SIZE =   16;      // aes.BlockSize
-    public static int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
-    public static int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
-    public static int HALF_TWEAK_LEN = TWEAK_LEN/2;
-    public static int MAX_RADIX =    256;
-    public static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
     public static String DIGITS = ("0123456789");
     public static String ASCII_LOWERCASE = ("abcdefghijklmnopqrstuvwxyz");
     public static String ASCII_UPPERCASE = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
