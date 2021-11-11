@@ -44,7 +44,7 @@ Build this project with gradle:
 `gradle build`
 
 Official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST,
-are used for testing in this package. Also included are draft ACVP test vectors with 56-bit tweaks.
+are used for testing in this package. Also included are draft ACVP test vectors for FF3-1 with 56-bit tweaks.
 
 To run the unit tests, including all test vectors from the NIST specification, run the command:
 
@@ -52,7 +52,7 @@ To run the unit tests, including all test vectors from the NIST specification, r
 
 ## Performance Benchmarks
 
-The Mysto FF3 was benchmarked on a MacBook Air (1.1 GHz Quad-Core Intel Core i5)
+Mysto FF3 was benchmarked on a MacBook Air (1.1 GHz Quad-Core Intel Core i5)
 performing 4,500 tokenization per second with mixed 8 character data input.
 
 To run the performance tests:
@@ -87,7 +87,7 @@ The example code below can help you get started.
 Using default domain [0-9]
 
 ```jshell
-   jshell --class-path build/libs/java-fpe-X.X-SNAPSHOT.jar
+   jshell --class-path build/libs/ff3-X.X.jar:~/lib/log4j-core-2.14.0.jar:~/lib/log4j-api-2.14.0.jar
 
     import com.privacylogistics.FF3Cipher;
     FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
