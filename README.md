@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.com/mysto/java-fpe.svg?branch=main)](https://travis-ci.com/mysto/java-fpe)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mysto/ff3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.mysto/ff3) 
+[![javadoc](https://javadoc.io/badge2/io.github.mysto/ff3/javadoc.svg)](https://javadoc.io/doc/io.github.mysto/ff3)
 
 # ff3 - Format Preserving Encryption in Java
 
@@ -18,6 +20,22 @@ NIST standard will provide updated test vectors with 56-bit tweak lengths.
 ## Requires
 
 This project was built and tested with Java 11.  It uses the javax.crypto for AES encryption in ECB mode.
+
+unctionality of this package is contained in Java package com.fasterxml.jackson.core.
+
+## Use
+
+To use the package, you need to use following Maven dependency:
+
+<dependency>
+    <groupId>io.github.mysto</groupId>
+    <artifactId>ff3</artifactId>
+    <version>0.9</version>
+</dependency>
+
+or simply download jars from the Maven Central repository.
+
+This package has no external dependencies, except for testing (which uses JUnit).
 
 ## Build & Testing
 
