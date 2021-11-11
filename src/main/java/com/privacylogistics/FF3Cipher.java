@@ -27,10 +27,12 @@ import java.util.Arrays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
+ */
 public class FF3Cipher {
     /**
-     * Class FF3Cipher implements the FF3 format-preserving encryption algorithm with default
-     * radix of 10.
+     * Constructor with default radix of 10.
      *
      * @param key   encryption key used to initialize AES ECB
      * @param tweak used in each round and split into right and left sides
@@ -40,7 +42,7 @@ public class FF3Cipher {
     }
 
     /**
-     * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
+     * Constructor with a custom alphabet
      *
      * @param key   encryption key used to initialize AES ECB
      * @param tweak used in each round and split into right and left sides
@@ -95,7 +97,7 @@ public class FF3Cipher {
     }
 
     /**
-     * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
+     * Constructor with a standardized radix
      *
      * @param key   encryption key used to initialize AES ECB
      * @param tweak used in each round and split into right and left sides
