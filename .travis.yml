@@ -1,5 +1,12 @@
 language: java
 os: freebsd
 
+jdk:
+  - openjdk8
+  - openjdk9
+  - openjdk11
+      
+install: true
+
 script:
   - gradle check
