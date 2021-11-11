@@ -19,9 +19,7 @@ NIST standard will provide updated test vectors with 56-bit tweak lengths.
 
 ## Requires
 
-This project was built and tested with Java 11.  It uses the javax.crypto for AES encryption in ECB mode.
-
-unctionality of this package is contained in Java package com.fasterxml.jackson.core.
+This project was built and tested with Java 8 and 11.  It uses the javax.crypto for AES encryption in ECB mode.
 
 ## Use
 
