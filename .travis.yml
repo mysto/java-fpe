@@ -2,7 +2,6 @@ language: java
 os: freebsd
 
 jdk:
-  - oraclejdk8
   - openjdk9
   - openjdk11
 
