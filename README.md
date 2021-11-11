@@ -32,7 +32,12 @@ To use the package, you need to use following Maven dependency:
     <version>0.9</version>
 </dependency>
 ```
+or Gradle Kotlin:
 
+```gradle
+implementation("io.
+github.mysto:ff3:0.9")
+```
 or simply download jars from the Maven Central repository.
 
 This package has no external dependencies, except for testing (which uses JUnit).
