@@ -27,11 +27,13 @@ unctionality of this package is contained in Java package com.fasterxml.jackson.
 
 To use the package, you need to use following Maven dependency:
 
-`<dependency>
+```maven
+<dependency>
     <groupId>io.github.mysto</groupId>
     <artifactId>ff3</artifactId>
     <version>0.9</version>
-</dependency>`
+</dependency>
+```
 
 or simply download jars from the Maven Central repository.
 
