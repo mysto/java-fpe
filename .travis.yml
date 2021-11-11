@@ -1,9 +1,5 @@
 language: java
 os: freebsd
 
-jdk:
-  - openjdk9
-  - openjdk11
-
 script:
   - gradle check
