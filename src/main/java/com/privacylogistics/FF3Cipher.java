@@ -62,6 +62,8 @@ public class FF3Cipher {
 
         // We simplify the specs log[radix](2^96) to 96/log2(radix) using the log base change rule
         this.maxLen = (int) (2 * Math.floor(Math.log(Math.pow(2, 96)) / Math.log(radix)));
+        // ToDo: With log2 we could further simplify this
+        // this.maxLen = (int) (2 * Math.floor(96/Math.log2(radix)));
 
         int keyLen = keyBytes.length;
         // Check if the key is 128, 192, or 256 bits = 16, 24, or 32 bytes
@@ -137,7 +139,7 @@ public class FF3Cipher {
         String B = plaintext.substring(u);
         logger.trace("r {} A {} B {}", this.radix, A, B);
 
-        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length == TWEAK_LEN_NEW)) {
+        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length != TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
                     this.tweakBytes.length));
         }
@@ -239,7 +241,7 @@ public class FF3Cipher {
         String A = ciphertext.substring(0, u);
         String B = ciphertext.substring(u);
 
-        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length == TWEAK_LEN_NEW)) {
+        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length != TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
                     this.tweakBytes.length));
         }
