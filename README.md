@@ -67,10 +67,10 @@ To run the performance tests:
 ## Usage
 
 FF3 is a Feistel cipher, and Feistel ciphers are initialized with a radix representing an alphabet. The number of 
-characters in an alphabet is called the _radix_.
-Practical radix limits of 36 in Java means the following radix values are typical:
+characters in an alphabet is called the _radix_. The following radix values are common:
 * radix 10: digits 0..9
 * radix 36: alphanumeric 0..9, a-z
+* radix 62: alphanumeric 0..9, a-z, A-Z
 
 Special characters and international character sets, such as those found in UTF-8, would require a larger radix, and are not supported.
 Also, all elements in a plaintext string share the same radix. Thus, an identification number that consists of a letter followed
@@ -79,6 +79,7 @@ by 6 digits (e.g. A123456) cannot be correctly encrypted by FPE while preserving
 Input plaintext has maximum length restrictions based upon the chosen radix (2 * floor(96/log2(radix))):
 * radix 10: 56
 * radix 36: 36
+* radix 62: 32
 
 To work around string length, its possible to encode longer text in chunks.
 
@@ -139,11 +140,10 @@ FPE can be used for sensitive data tokenization, especially with PCI and cryptog
 
 While all test vectors pass, this package has not otherwise been extensively tested.
 
-Java's [BigInteger](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/math/BigInteger.html) supports radices/bases up to 36. Therefore, this package also supports a max base of 36, which can contain numeric digits 0-9 and lowercase alphabetic characters a-z.
-
 FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec.
 
-The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
+The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. 
+FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
 
 The tweak is required in the initial `FF3Cipher` constructor, but can optionally be overridden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
 
