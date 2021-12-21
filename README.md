@@ -35,8 +35,7 @@ To use the package, you need to use following Maven dependency:
 or Gradle Kotlin:
 
 ```gradle
-implementation("io.
-github.mysto:ff3:0.9")
+implementation("io.github.mysto:ff3:0.9")
 ```
 or simply download jars from the Maven Central repository.
 
