@@ -95,8 +95,8 @@ Using default domain [0-9]
    jshell --class-path build/libs/ff3-X.X.jar:~/lib/log4j-core-2.14.0.jar:~/lib/log4j-api-2.14.0.jar
 
     import com.privacylogistics.FF3Cipher;
-    FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
-    String pt = "4000001234567899";
+    FF3Cipher c = new FF3Cipher("2DE79D232DF5585D68CE47882AE256D6", "CBD09280979564");
+    String pt = "3992520240";
     String ciphertext = c.encrypt(pt);
     String plaintext = c.decrypt(ciphertext);
     pt;ciphertext;plaintext
@@ -109,7 +109,7 @@ from the above code example with:
 
 ```java
 FF3Cipher c6 = new FF3Cipher(key, tweak, "ABCDEF");
-String plaintext = "DEADBEEF";
+String plaintext = "BADDCAFE";
 String ciphertext = c6.encrypt(plaintext);
 String decrypted = c6.decrypt(ciphertext);
 
