@@ -109,7 +109,14 @@ public class FF3Cipher {
         this(key, tweak, alphabetForBase(radix));
     }
 
-    /** convenience method to override tweak */
+    /**
+     * Encrypt a value  - convenience method to override tweak
+     * @param plaintext   a plaintext to encrypt
+     * @param tweak       a local tweak for encrypting
+     * @return            the ciphertext
+     * @throws BadPaddingException internal error
+     * @throws IllegalBlockSizeException internal error
+     */
     @SuppressWarnings("unused")
     public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
@@ -120,7 +127,9 @@ public class FF3Cipher {
      * Encrypt a value
      * @param plaintext   a plaintext to encrypt
      * @return            the ciphertext
-     * */
+     * @throws BadPaddingException internal error
+     * @throws IllegalBlockSizeException internal error
+     */
     public String encrypt(String plaintext) throws BadPaddingException, IllegalBlockSizeException {
         int n = plaintext.length();
 
@@ -212,7 +221,14 @@ public class FF3Cipher {
         return A + B;
     }
 
-    /** convenience method to override tweak */
+    /**
+     * Decrypt a value - convenience method to override tweak
+     * @param ciphertext   a ciphertext to decrypt
+     * @param tweak        a local tweak for decrypting
+     * @return             the plaintext
+     * @throws BadPaddingException internal error
+     * @throws IllegalBlockSizeException internal error
+     */
     @SuppressWarnings("unused")
     public String decrypt(String ciphertext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
         this.tweakBytes = hexStringToByteArray(tweak);
@@ -223,7 +239,9 @@ public class FF3Cipher {
      * Decrypt a value
      * @param ciphertext   a ciphertext to decrypt
      * @return             the plaintext
-     * */
+     * @throws BadPaddingException internal error
+     * @throws IllegalBlockSizeException internal error
+     */
     public String decrypt(String ciphertext) throws BadPaddingException, IllegalBlockSizeException {
         int n = ciphertext.length();
 
@@ -316,6 +334,8 @@ public class FF3Cipher {
 
     /**
      * For FF3-1, calculate a 64-bit tweak by transforming a 56-bit tweak
+     * @param tweak56      an input 56-bit tweak
+     * @return             the reconstituted tweak
      */
     protected static byte[] calculateTweak64_FF3_1(byte[] tweak56)
     {
@@ -332,6 +352,14 @@ public class FF3Cipher {
         return tweak64;
     }
 
+    /**
+     * Calculate P, an intermediate value
+     * @param i            an int
+     * @param alphabet     an alphabet
+     * @param W            a byte array
+     * @param B            a string value
+     * @return             a byte array
+     */
     protected static byte[] calculateP(int i, String alphabet, byte[] W, String B) {
 
         byte[] P = new byte[BLOCK_SIZE];     // P is always 16 bytes, zero initialized
@@ -355,12 +383,18 @@ public class FF3Cipher {
         return P;
     }
 
+    /**
+     * Reverse an immutable string
+     * @param s            the original string
+     * @return             the new string
+     */
     protected static String reverseString(String s) {
         return new StringBuilder(s).reverse().toString();
     }
 
     /**
      * Reverse a byte array in-place
+     * @param b            a mutable byte array
      */
     protected void reverseBytes(byte[] b) {
         for (int i = 0; i < b.length / 2; i++) {
@@ -370,6 +404,11 @@ public class FF3Cipher {
         }
     }
 
+    /**
+     * Returns a byte array containing hexadecimal values parsed from the string
+     * @param s          a character string containing hexadecimal digits
+     * @return           a byte array with the values parsed from the string
+     */
     protected static byte[] hexStringToByteArray(String s) {
         byte[] data = new byte[s.length() / 2];
         for (int i = 0; i < s.length(); i += 2) {
@@ -381,6 +420,8 @@ public class FF3Cipher {
     /**
      * used for debugging
      * Java 17 has java.util.HexFormat
+     * @param byteArray  a byte array
+     * @return           a hex string encoding of a number
      */
     protected static String byteArrayToHexString(byte[] byteArray) {
 
@@ -393,7 +434,9 @@ public class FF3Cipher {
     }
 
     /**
-     * used for debugging
+     * used for debugging output
+     * @param byteArray  a byte array
+     * @return           a decimal string encoding of a number
      */
     protected static String byteArrayToIntString(byte[] byteArray) {
 
@@ -417,6 +460,10 @@ public class FF3Cipher {
      *      examples:
      *         encode_int_r(10, 16,2)
      *          'A0'
+     * @param n          the integer number
+     * @param alphabet   the alphabet used for encoding
+     * @param length     the length used for padding the output string
+     * @return           a string encoding of the number
      */
     protected static String encode_int_r(BigInteger n, String alphabet, int length) {
 
@@ -439,10 +486,12 @@ public class FF3Cipher {
     }
 
     /**
-     * Decode a base X string representation into a number
+     * Decode a base X string representation into an integer
+     * @param str          the original string
+     * @param alphabet     the alphabet and radix (len(alphabet)) for decoding
+     * @return             an integer value of the encoded string
      */
     protected static BigInteger decode_int(String str, String alphabet) {
-
 
         int strlen = str.length();
         BigInteger base = BigInteger.valueOf(alphabet.length());
@@ -456,6 +505,11 @@ public class FF3Cipher {
         return num;
     }
 
+    /**
+     * Return the canonical alphabet for a given base
+     * @param base          a base
+     * @return              the canonical alphabet for the base
+     */
     protected static String alphabetForBase(int base) {
         switch (base) {
             case 10:
@@ -472,20 +526,20 @@ public class FF3Cipher {
         }
     }
 
-    private static int NUM_ROUNDS =   8;
-    private static int BLOCK_SIZE =   16;      // aes.BlockSize
-    private static int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
-    private static int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
-    private static int HALF_TWEAK_LEN = TWEAK_LEN/2;
+    private static final int NUM_ROUNDS =   8;
+    private static final int BLOCK_SIZE =   16;      // aes.BlockSize
+    private static final int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
+    private static final int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
+    private static final int HALF_TWEAK_LEN = TWEAK_LEN/2;
     private static int MAX_RADIX =    256;
-    private static Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
+    private static final Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
 
-    // The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
-    // the minimum domain size for FF1 and FF3-1 is one million.
+    /** The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
+       the minimum domain size for FF1 and FF3-1 is one million */
     public static int DOMAIN_MIN =  1000000;  // 1M
-    public static String DIGITS = ("0123456789");
-    public static String ASCII_LOWERCASE = ("abcdefghijklmnopqrstuvwxyz");
-    public static String ASCII_UPPERCASE = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    public static final String DIGITS = ("0123456789");
+    public static final String ASCII_LOWERCASE = ("abcdefghijklmnopqrstuvwxyz");
+    public static final String ASCII_UPPERCASE = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     private final int radix;
     private final String alphabet;
