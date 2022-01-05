@@ -3,6 +3,15 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mysto/ff3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.mysto/ff3) 
 [![javadoc](https://javadoc.io/badge2/io.github.mysto/ff3/javadoc.svg)](https://javadoc.io/doc/io.github.mysto/ff3)
 
+<p align="center">
+  <a href="https://privacylogistics.com/">
+    <img
+      alt="Mysto"
+      src="https://privacylogistics.com/Mysto-logo.jpg"
+    />
+  </a>
+</p>
+
 # ff3 - Format Preserving Encryption in Java
 
 An implementation of the NIST approved FF3 and FF3-1 Format Preserving Encryption (FPE) algorithms in Java.
