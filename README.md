@@ -110,6 +110,11 @@ The FF3 round function uses AES encryption in ECB mode, which is performed each 
 on alternating halves of the text being encrypted. The *key* value is used only to initialize the AES cipher. Thereafter
 the *tweak* is used together with the intermediate encrypted text as input to the round function.
 
+FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec.
+
+The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. 
+FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
+
 ## Other FPE Algorithms
 
 Only FF1 and FF3 have been approved by NIST for format preserving encryption. There are patent claims on FF1 which allegedly include open source implementations. Given the issues raised in ["The Curse of Small Domains: New Attacks on Format-Preserving Encryption"](https://eprint.iacr.org/2018/556.pdf) by Hoang, Tessaro and Trieu in 2018, it is prudent to be very cautious about using any FPE that isn't a standard and hasn't stood up to public scrutiny.
@@ -145,13 +150,6 @@ This project was built and tested with Java 8 and 11.  It uses the javax.crypto 
 This implementation follows the algorithm as outlined in the NIST specification as closely as possible, including naming.
 
 FPE can be used for sensitive data tokenization, especially with PCI and cryptographically reversible tokens. This implementation does not provide any guarantees regarding PCI DSS or other validation.
-
-While all test vectors pass, this package has not otherwise been extensively tested.
-
-FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec.
-
-The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. 
-FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
 
 The tweak is required in the initial `FF3Cipher` constructor, but can optionally be overridden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
 
