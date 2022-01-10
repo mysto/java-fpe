@@ -26,10 +26,6 @@ Changes to minimum domain size and revised tweak length have been implemented in
 both 64-bit and 56-bit tweaks are supported. NIST has only published official test vectors for 64-bit tweaks, but draft ACVP test vectors have been used for testing FF3-1. It is expected the final
 NIST standard will provide updated test vectors with 56-bit tweak lengths.
 
-## Requires
-
-This project was built and tested with Java 8 and 11.  It uses the javax.crypto for AES encryption in ECB mode.
-
 ## Use
 
 To use the package, you need to use following Maven dependency:
@@ -38,39 +34,17 @@ To use the package, you need to use following Maven dependency:
 <dependency>
     <groupId>io.github.mysto</groupId>
     <artifactId>ff3</artifactId>
-    <version>0.9</version>
+    <version>1.0</version>
 </dependency>
 ```
 or Gradle Kotlin:
 
 ```gradle
-implementation("io.github.mysto:ff3:0.9")
+implementation("io.github.mysto:ff3:1.0")
 ```
 or simply download jars from the Maven Central repository.
 
 This package has no external dependencies, except for testing (which uses JUnit).
-
-## Build & Testing
-
-Build this project with gradle:
-
-`gradle build`
-
-Official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST,
-are used for testing in this package. Also included are draft ACVP test vectors for FF3-1 with 56-bit tweaks.
-
-To run the unit tests, including all test vectors from the NIST specification, run the command:
-
-`gradle test`
-
-## Performance Benchmarks
-
-Mysto FF3 was benchmarked on a MacBook Air (1.1 GHz Quad-Core Intel Core i5)
-performing 4,500 tokenization per second with mixed 8 character data input.
-
-To run the performance tests:
-
-`gradle jmh`
 
 ## Usage
 
@@ -139,6 +113,32 @@ the *tweak* is used together with the intermediate encrypted text as input to th
 ## Other FPE Algorithms
 
 Only FF1 and FF3 have been approved by NIST for format preserving encryption. There are patent claims on FF1 which allegedly include open source implementations. Given the issues raised in ["The Curse of Small Domains: New Attacks on Format-Preserving Encryption"](https://eprint.iacr.org/2018/556.pdf) by Hoang, Tessaro and Trieu in 2018, it is prudent to be very cautious about using any FPE that isn't a standard and hasn't stood up to public scrutiny.
+
+## Build & Testing
+
+Build this project with gradle:
+
+`gradle build`
+
+Official [test vectors](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ff3samples.pdf) for FF3 provided by NIST,
+are used for testing in this package. Also included are draft ACVP test vectors for FF3-1 with 56-bit tweaks.
+
+To run the unit tests, including all test vectors from the NIST specification, run the command:
+
+`gradle test`
+
+## Performance Benchmarks
+
+Mysto FF3 was benchmarked on a MacBook Air (1.1 GHz Quad-Core Intel Core i5)
+performing 4,500 tokenization per second with mixed 8 character data input.
+
+To run the performance tests:
+
+`gradle jmh`
+
+## Requires
+
+This project was built and tested with Java 8 and 11.  It uses the javax.crypto for AES encryption in ECB mode.
 
 ## Implementation Notes
 

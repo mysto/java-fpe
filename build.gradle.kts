@@ -19,7 +19,7 @@ dependencies {
 
 
 group = "io.github.mysto"
-version = "0.9"
+version = "1.0"
 
 java {
     withJavadocJar()
@@ -43,7 +43,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             groupId = "io.github.mysto"
             artifactId = "ff3"
-            version = "0.9"
+            version = "1.0"
 
             from(components["java"])
             versionMapping {
