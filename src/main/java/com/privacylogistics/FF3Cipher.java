@@ -420,7 +420,6 @@ public class FF3Cipher {
     }
 
     /**
-     * used for debugging
      * Java 17 has java.util.HexFormat
      * @param byteArray  a byte array
      * @return           a hex string encoding of a number
