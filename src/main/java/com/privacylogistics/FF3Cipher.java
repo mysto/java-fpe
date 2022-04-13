@@ -17,6 +17,7 @@ package com.privacylogistics;
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import java.nio.charset.StandardCharsets;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
@@ -412,7 +413,8 @@ public class FF3Cipher {
     protected static byte[] hexStringToByteArray(String s) {
         byte[] data = new byte[s.length() / 2];
         for (int i = 0; i < s.length(); i += 2) {
-            data[i / 2] = (Integer.decode("0x" + s.charAt(i) + s.charAt(i + 1))).byteValue();
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                + Character.digit(s.charAt(i+1), 16));
         }
         return data;
     }
@@ -424,13 +426,13 @@ public class FF3Cipher {
      * @return           a hex string encoding of a number
      */
     protected static String byteArrayToHexString(byte[] byteArray) {
-
-        StringBuilder sb = new StringBuilder();
-        for (byte b : byteArray) {
-            String aByte = String.format("%02X", b);
-            sb.append(aByte);
+        byte[] hexChars = new byte[byteArray.length * 2];
+        for (int j = 0; j < byteArray.length; j++) {
+            int v = byteArray[j] & 0xFF;
+            hexChars[j * 2] = (byte) HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = (byte) HEX_ARRAY[v & 0x0F];
         }
-        return sb.toString();
+        return new String(hexChars, StandardCharsets.UTF_8);
     }
 
     /**
@@ -526,6 +528,7 @@ public class FF3Cipher {
         }
     }
 
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     private static final int NUM_ROUNDS =   8;
     private static final int BLOCK_SIZE =   16;      // aes.BlockSize
     private static final int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
