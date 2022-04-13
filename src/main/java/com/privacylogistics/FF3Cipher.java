@@ -441,16 +441,7 @@ public class FF3Cipher {
      * @return           a decimal string encoding of a number
      */
     protected static String byteArrayToIntString(byte[] byteArray) {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append('[');
-        for (byte b : byteArray) {
-            // cast signed byte to int and mask for last byte
-            String aByte = String.format("%d ", ((int) b) & 0xFF);
-            sb.append(aByte);
-        }
-        sb.append(']');
-        return sb.toString();
+        return Arrays.toString(byteArray);
     }
 
     /**
