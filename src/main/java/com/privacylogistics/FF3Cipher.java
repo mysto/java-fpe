@@ -155,7 +155,7 @@ public class FF3Cipher {
         }
 
         // Calculate the tweak
-        logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
+        logger.trace("tweak: {}", () -> byteArrayToHexString(this.tweakBytes));
 
         byte[] tweak64 = (this.tweakBytes.length == TWEAK_LEN_NEW) ?
                 calculateTweak64_FF3_1(this.tweakBytes) : this.tweakBytes;
@@ -172,7 +172,7 @@ public class FF3Cipher {
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
         logger.trace("u {} v {} modU: {} modV: {}", u, v, modU, modV);
-        logger.trace("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
+        logger.trace("tL: {} tR: {}", () -> byteArrayToHexString(Tl), () -> byteArrayToHexString(Tr));
 
         for (byte i = 0; i < NUM_ROUNDS; ++i) {
             int m;
@@ -195,7 +195,7 @@ public class FF3Cipher {
             // Calculate S by operating on P in place
             byte[] S = this.aesCipher.doFinal(P);
             reverseBytes(S);
-            logger.trace("\tS: {}", byteArrayToHexString(S));
+            logger.trace("\tS: {}", () -> byteArrayToHexString(S));
 
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
@@ -266,7 +266,7 @@ public class FF3Cipher {
         }
 
         // Calculate the tweak
-        logger.trace("tweak: {}", byteArrayToHexString(this.tweakBytes));
+        logger.trace("tweak: {}", () -> byteArrayToHexString(this.tweakBytes));
 
         byte[] tweak64 = (this.tweakBytes.length == TWEAK_LEN_NEW) ?
                 calculateTweak64_FF3_1(this.tweakBytes) : this.tweakBytes;
@@ -283,7 +283,7 @@ public class FF3Cipher {
         BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
         BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
         logger.trace("modU: {} modV: {}", modU, modV);
-        logger.trace("tL: {} tR: {}", byteArrayToHexString(Tl), byteArrayToHexString(Tr));
+        logger.trace("tL: {} tR: {}", () -> byteArrayToHexString(Tl), () -> byteArrayToHexString(Tr));
 
         for (byte i = (byte) (NUM_ROUNDS - 1); i >= 0; --i) {
             int m;
@@ -306,7 +306,7 @@ public class FF3Cipher {
             // Calculate S by operating on P in place
             byte[] S = this.aesCipher.doFinal(P);
             reverseBytes(S);
-            logger.trace("\tS: {}", byteArrayToHexString(S));
+            logger.trace("\tS: {}", () -> byteArrayToHexString(S));
 
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
@@ -380,7 +380,7 @@ public class FF3Cipher {
         byte[] bBytes = decode_int(B, alphabet).toByteArray();
 
         System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
-        logger.trace("round: {} W: {} P: {}", i, byteArrayToHexString(W), byteArrayToIntString(P));
+        logger.trace("round: {} W: {} P: {}", () -> i, () -> byteArrayToHexString(W), () -> byteArrayToIntString(P));
         return P;
     }
 
