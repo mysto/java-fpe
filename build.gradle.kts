@@ -43,7 +43,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             groupId = "io.github.mysto"
             artifactId = "ff3"
-            version = "1.0"
+            version = "1.0.1"
 
             from(components["java"])
             versionMapping {
