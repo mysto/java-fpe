@@ -19,7 +19,7 @@ dependencies {
 
 
 group = "io.github.mysto"
-version = "1.0"
+version = "1.0.1"
 
 java {
     withJavadocJar()
