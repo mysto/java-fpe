@@ -207,7 +207,6 @@ public class FF3Cipher {
             // Final steps
             A = B;
             B = C;
-            logger.trace("A: {} B: {}", A, B);
         }
         return A + B;
     }
@@ -311,7 +310,6 @@ public class FF3Cipher {
             // Final steps
             B = A;
             A = C;
-            logger.trace("A: {} B: {}", A, B);
         }
         return A + B;
     }
