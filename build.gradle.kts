@@ -14,12 +14,11 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.2")
-    implementation("org.apache.logging.log4j:log4j-api:2.17.1")
 }
 
 
 group = "io.github.mysto"
-version = "1.0.1"
+version = "1.1"
 
 java {
     withJavadocJar()
@@ -43,7 +42,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             groupId = "io.github.mysto"
             artifactId = "ff3"
-            version = "1.0.1"
+            version = "1.1"
 
             from(components["java"])
             versionMapping {
@@ -73,6 +72,10 @@ publishing {
                         id.set("bschoeni")
                         name.set("Brad Schoening")
                     }
+                    developer {
+                        id.set("raymainville")
+                        name.set("Ray Mainville")
+                    }                    
                 }
                 scm {
                     connection.set("scm:git:git://github.com/mysto/java-fpe.git")
