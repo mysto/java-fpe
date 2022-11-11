@@ -44,7 +44,7 @@ implementation("io.github.mysto:ff3:1.0")
 ```
 or simply download jars from the Maven Central repository.
 
-This package has no external dependencies, except for testing (which uses JUnit).
+This package has external dependencies only on Log4j and testing (which uses JUnit).
 
 ## Usage
 
