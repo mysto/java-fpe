@@ -511,7 +511,7 @@ public class FF3Cipher {
                 return DIGITS + "abcdefghijklmnop";
             case 36:
                 return DIGITS + ASCII_UPPERCASE;
-            case 64:
+            case 62:
                 return DIGITS + ASCII_UPPERCASE + ASCII_LOWERCASE;
             default:
                 throw new RuntimeException("Unsupported radix");
