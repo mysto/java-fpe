@@ -177,7 +177,22 @@ public class FF3CipherTest {
     public void testNistFF3() throws Exception {
         // NIST FF3-AES 128, 192, 256
         for( String[] testVector : TestVectors) {
-            FF3Cipher c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], Integer.parseInt(testVector[Tradix]));
+            // NIST radix to alphabet mappings are non-standard, so we special case them here
+            FF3Cipher c;
+            int r = Integer.parseInt(testVector[Tradix]);
+            switch (r) {
+                case 2:
+                    c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], 2);
+                    break;
+                case 10:
+                    c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], 10);
+                    break;
+                case 26:
+                    c = new FF3Cipher(testVector[Tkey], testVector[Ttweak], FF3Cipher.DIGITS + "abcdefghijklmnop");
+                    break;
+                default:
+                    throw new RuntimeException(String.format("Unsupported radix %d", r));
+            }
             String pt = testVector[Tplaintext], ct = testVector[Tciphertext];
             String ciphertext = c.encrypt(pt);
             String plaintext = c.decrypt(ciphertext);

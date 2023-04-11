@@ -507,8 +507,8 @@ public class FF3Cipher {
             case 10:
                 return DIGITS;
             case 26:
-                // used by NIST test vectors
-                return DIGITS + "abcdefghijklmnop";
+                // used by NIST test vectors but deprecated in constructor
+                // return DIGITS + "abcdefghijklmnop";
             case 36:
                 return DIGITS + ASCII_UPPERCASE;
             case 62:
