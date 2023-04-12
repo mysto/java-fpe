@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/mysto/java-fpe.svg?branch=main)](https://travis-ci.com/mysto/java-fpe)
+[![Build Status](https://github.com/mysto/java-fpe/actions/workflows/build-gradle.yml/badge.svg)](https://github.com/mysto/java-fpe/actions)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mysto/ff3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.mysto/ff3) 
 [![javadoc](https://javadoc.io/badge2/io.github.mysto/ff3/javadoc.svg)](https://javadoc.io/doc/io.github.mysto/ff3)
