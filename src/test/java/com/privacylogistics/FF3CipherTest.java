@@ -264,4 +264,25 @@ public class FF3CipherTest {
         String plaintext = c.decrypt(ciphertext);
         assertEquals(pt, plaintext);
     }
+
+    @Test
+    void testTweakHasNoSideEffects() throws Exception {
+        String key = "EF4359D8D580AA4F7F036D6F04FC6A94";
+        String tweak = "D8E7920AFA330A73";
+        String tweak2 = "0000000000000000";
+        String alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+        FF3Cipher c = new FF3Cipher(key, tweak, alphabet);
+        String pt = "Foobar";
+
+        String ciphertext1 = c.encrypt(pt);
+        String ciphertext2 = c.encrypt(pt, tweak);
+        assertEquals(ciphertext1, ciphertext2);
+
+        String ciphertext3 = c.encrypt(pt, tweak2); // this will NOT overwrite the initial tweak
+        assertNotEquals(ciphertext1, ciphertext3); // different ciphertexts because different tweaks were used
+
+        String ciphertext4 = c.encrypt(pt); // will still use the initial tweak
+        assertEquals(ciphertext1, ciphertext4);
+    }
 }
