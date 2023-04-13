@@ -82,7 +82,7 @@ public class FF3Cipher {
             throw new IllegalArgumentException("minLen or maxLen invalid, adjust your radix");
         }
 
-        this.tweakBytes = hexStringToByteArray(tweak);
+        this.defaultTweak = hexStringToByteArray(tweak);
 
         // AES block cipher in ECB mode with the block size derived based on the length of the key
         // Always use the reversed key since Encrypt and Decrypt call cipher expecting that
@@ -111,7 +111,18 @@ public class FF3Cipher {
     }
 
     /**
-     * Encrypt a value  - convenience method to override tweak
+     * Encrypt a value using default tweak
+     * @param plaintext   a plaintext to encrypt
+     * @return            the ciphertext
+     * @throws BadPaddingException internal error
+     * @throws IllegalBlockSizeException internal error
+     */
+    public String encrypt(String plaintext) throws BadPaddingException, IllegalBlockSizeException {
+        return encrypt(plaintext, this.defaultTweak);
+    }
+
+    /**
+     * Encrypt a value
      * @param plaintext   a plaintext to encrypt
      * @param tweak       a local tweak for encrypting
      * @return            the ciphertext
@@ -120,8 +131,7 @@ public class FF3Cipher {
      */
     @SuppressWarnings("unused")
     public String encrypt(String plaintext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
-        this.tweakBytes = hexStringToByteArray(tweak);
-        return encrypt(plaintext);
+        return encrypt(plaintext, hexStringToByteArray(tweak));
     }
 
     /**
@@ -131,7 +141,7 @@ public class FF3Cipher {
      * @throws BadPaddingException internal error
      * @throws IllegalBlockSizeException internal error
      */
-    public String encrypt(String plaintext) throws BadPaddingException, IllegalBlockSizeException {
+    public String encrypt(String plaintext, byte[] tweak) throws BadPaddingException, IllegalBlockSizeException {
         int n = plaintext.length();
 
         // Check if message length is within minLength and maxLength bounds
@@ -149,16 +159,16 @@ public class FF3Cipher {
         String B = plaintext.substring(u);
         logger.trace("r {} A {} B {}", this.radix, A, B);
 
-        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length != TWEAK_LEN_NEW)) {
+        if ((tweak.length != TWEAK_LEN) && (tweak.length != TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
-                    this.tweakBytes.length));
+                    tweak.length));
         }
 
         // Calculate the tweak
-        logger.trace("tweak: {}", () -> byteArrayToHexString(this.tweakBytes));
+        logger.trace("tweak: {}", () -> byteArrayToHexString(tweak));
 
-        byte[] tweak64 = (this.tweakBytes.length == TWEAK_LEN_NEW) ?
-                calculateTweak64_FF3_1(this.tweakBytes) : this.tweakBytes;
+        byte[] tweak64 = (tweak.length == TWEAK_LEN_NEW) ?
+                calculateTweak64_FF3_1(tweak) : tweak;
 
         byte[] Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
         byte[] Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
@@ -223,7 +233,18 @@ public class FF3Cipher {
     }
 
     /**
-     * Decrypt a value - convenience method to override tweak
+     * Decrypt a value using default tweak
+     * @param ciphertext   a ciphertext to decrypt
+     * @return             the plaintext
+     * @throws BadPaddingException internal error
+     * @throws IllegalBlockSizeException internal error
+     */
+    public String decrypt(String ciphertext) throws BadPaddingException, IllegalBlockSizeException {
+        return decrypt(ciphertext, this.defaultTweak);
+    }
+
+    /**
+     * Decrypt a value
      * @param ciphertext   a ciphertext to decrypt
      * @param tweak        a local tweak for decrypting
      * @return             the plaintext
@@ -232,8 +253,7 @@ public class FF3Cipher {
      */
     @SuppressWarnings("unused")
     public String decrypt(String ciphertext, String tweak) throws BadPaddingException, IllegalBlockSizeException {
-        this.tweakBytes = hexStringToByteArray(tweak);
-        return decrypt(ciphertext);
+        return decrypt(ciphertext, hexStringToByteArray(tweak));
     }
 
     /**
@@ -243,7 +263,7 @@ public class FF3Cipher {
      * @throws BadPaddingException internal error
      * @throws IllegalBlockSizeException internal error
      */
-    public String decrypt(String ciphertext) throws BadPaddingException, IllegalBlockSizeException {
+    public String decrypt(String ciphertext, byte[] tweak) throws BadPaddingException, IllegalBlockSizeException {
         int n = ciphertext.length();
 
         // Check if message length is within minLength and maxLength bounds
@@ -260,16 +280,16 @@ public class FF3Cipher {
         String A = ciphertext.substring(0, u);
         String B = ciphertext.substring(u);
 
-        if ((this.tweakBytes.length != TWEAK_LEN) && (this.tweakBytes.length != TWEAK_LEN_NEW)) {
+        if ((tweak.length != TWEAK_LEN) && (tweak.length != TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
-                    this.tweakBytes.length));
+                    tweak.length));
         }
 
         // Calculate the tweak
-        logger.trace("tweak: {}", () -> byteArrayToHexString(this.tweakBytes));
+        logger.trace("tweak: {}", () -> byteArrayToHexString(tweak));
 
-        byte[] tweak64 = (this.tweakBytes.length == TWEAK_LEN_NEW) ?
-                calculateTweak64_FF3_1(this.tweakBytes) : this.tweakBytes;
+        byte[] tweak64 = (tweak.length == TWEAK_LEN_NEW) ?
+                calculateTweak64_FF3_1(tweak) : tweak;
 
         byte[] Tl = Arrays.copyOf(tweak64, HALF_TWEAK_LEN);
         byte[] Tr = Arrays.copyOfRange(tweak64, HALF_TWEAK_LEN, TWEAK_LEN);
@@ -536,7 +556,7 @@ public class FF3Cipher {
 
     private final int radix;
     private final String alphabet;
-    private byte[] tweakBytes;
+    private byte[] defaultTweak;
     private final int minLen;
     private final int maxLen;
     private final Cipher aesCipher;
