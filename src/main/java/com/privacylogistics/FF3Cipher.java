@@ -137,6 +137,7 @@ public class FF3Cipher {
     /**
      * Encrypt a value
      * @param plaintext   a plaintext to encrypt
+     * @param tweak       a local tweak for encrypting
      * @return            the ciphertext
      * @throws BadPaddingException internal error
      * @throws IllegalBlockSizeException internal error
@@ -259,6 +260,7 @@ public class FF3Cipher {
     /**
      * Decrypt a value
      * @param ciphertext   a ciphertext to decrypt
+     * @param tweak        a local tweak for decrypting
      * @return             the plaintext
      * @throws BadPaddingException internal error
      * @throws IllegalBlockSizeException internal error
