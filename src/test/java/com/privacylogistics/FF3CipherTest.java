@@ -239,10 +239,22 @@ public class FF3CipherTest {
     }
 
     @Test
-    public void testFF3_1() throws Exception {
+    public void testFF3_1_str() throws Exception {
         // Test with 56 bit tweak
         String[] testVector = TestVectors[0];
         FF3Cipher c = new FF3Cipher(testVector[Tkey], "D8E7920AFA330A", Integer.parseInt(testVector[Tradix]));
+        String pt = testVector[Tplaintext], ct = "477064185124354662";
+        String ciphertext = c.encrypt(pt);
+        String plaintext = c.decrypt(ciphertext);
+        assertEquals(ct, ciphertext);
+        assertEquals(pt, plaintext);
+    }
+
+    @Test
+    public void testFF3_1_bytes() throws Exception {
+        // Test with 56 bit tweak
+        String[] testVector = TestVectors[0];
+        FF3Cipher c = new FF3Cipher(hexStringToByteArray(testVector[Tkey]), hexStringToByteArray("D8E7920AFA330A"), Integer.parseInt(testVector[Tradix]));
         String pt = testVector[Tplaintext], ct = "477064185124354662";
         String ciphertext = c.encrypt(pt);
         String plaintext = c.decrypt(ciphertext);
