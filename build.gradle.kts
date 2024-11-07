@@ -15,8 +15,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.2")
     implementation("org.apache.logging.log4j:log4j-api:2.17.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.17.1")
 }
-
 
 group = "io.github.mysto"
 version = "1.0.4"
@@ -30,14 +30,19 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-tasks.withType<Test> {
-    systemProperty("file.encoding", "UTF-8")
-}
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+tasks.withType<Test> {
+    systemProperty("file.encoding", "UTF-8")
+    testLogging.showStandardStreams = true
+	testLogging {
+		events("PASSED", "SKIPPED", "FAILED", "STANDARD_OUT", "STANDARD_ERROR")
+	}
+
+}
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
