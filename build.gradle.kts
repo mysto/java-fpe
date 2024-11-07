@@ -37,7 +37,6 @@ tasks.withType<Test>().configureEach {
 
 tasks.withType<Test> {
     systemProperty("file.encoding", "UTF-8")
-    testLogging.showStandardStreams = true
 	testLogging {
 		events("PASSED", "SKIPPED", "FAILED", "STANDARD_OUT", "STANDARD_ERROR")
 	}
