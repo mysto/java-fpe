@@ -19,6 +19,7 @@ package com.privacylogistics;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnJre;
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.condition.JRE;
 
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import static com.privacylogistics.FF3Cipher.reverseString;
 import static com.privacylogistics.FF3Cipher.encode_int_r;
 import static com.privacylogistics.FF3Cipher.decode_int;
+import static com.privacylogistics.FF3Cipher.hexStringToByteArray;
 
 public class FF3CipherTest {
 
@@ -119,9 +121,25 @@ public class FF3CipherTest {
     };
 
     @Test
-    public void testCreate() {
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
-        assertNotNull(c);
+    public void testConstructors() {
+        String keyStr = "EF4359D8D580AA4F7F036D6F04FC6A94";
+        String tweakStr = "D8E7920AFA330A73";
+        byte[] keyBytes = hexStringToByteArray(keyStr);
+        byte[] tweakBytes = hexStringToByteArray(tweakStr);
+
+        FF3Cipher cs0 = new FF3Cipher(keyStr, tweakStr);
+        FF3Cipher cs1 = new FF3Cipher(keyStr, tweakStr, 62);
+        FF3Cipher cs2 = new FF3Cipher(keyStr, tweakStr, "0123456789");
+        FF3Cipher cb0 = new FF3Cipher(keyBytes, tweakBytes);
+        FF3Cipher cb1 = new FF3Cipher(keyBytes, tweakBytes, 62);
+        FF3Cipher cb2 = new FF3Cipher(keyBytes, tweakBytes, "0123456789");
+
+        assertNotNull(cs0);
+        assertNotNull(cs1);
+        assertNotNull(cs2);
+        assertNotNull(cb0);
+        assertNotNull(cb1);
+        assertNotNull(cb2);
     }
 
     @Test
