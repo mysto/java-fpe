@@ -167,7 +167,7 @@ public class FF3CipherTest {
     public void testDecodeInt() {
         assertEquals(BigInteger.valueOf(123), (decode_int_r("321".toCharArray(), "0123456789")));
         assertEquals(BigInteger.valueOf(101), (decode_int_r("101".toCharArray(), "0123456789")));
-        assertEquals(BigInteger.valueOf(10100), (decode_int_r("00101".toCharArray(), "0123456789")));
+        assertEquals(BigInteger.valueOf(101), (decode_int_r("10100".toCharArray(), "0123456789")));
         assertEquals(BigInteger.valueOf(0x20), (decode_int_r("02".toCharArray(), "0123456789abcdef")));
         assertEquals(BigInteger.valueOf(0xAA), (decode_int_r("aa".toCharArray(), "0123456789abcdef")));
         assertEquals(new BigInteger("2297305934914824457484538562"), (decode_int_r("2658354847544284194395037922".toCharArray(), "0123456789")));
