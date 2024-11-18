@@ -18,7 +18,7 @@ package com.privacylogistics;
  */
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.DisabledOnJre;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.condition.JRE;
@@ -263,7 +263,7 @@ public class FF3CipherTest {
     }
 
     @Test
-    @EnabledOnJre(value = JRE.JAVA_11)
+    @DisabledOnJre(JRE.JAVA_8)
     public void testCustomAlphabet() throws Exception {
         // Check the first NIST 128-bit test vector using superscript characters
         String alphabet = "⁰¹²³⁴⁵⁶⁷⁸⁹";
