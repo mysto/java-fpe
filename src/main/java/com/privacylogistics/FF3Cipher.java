@@ -43,17 +43,25 @@ public class FF3Cipher {
     }
 
     /**
+     * Constructor with default radix of 10.
+     *
+     * @param key   encryption key used to initialize AES ECB
+     * @param tweak used in each round and split into right and left sides
+     */
+    public FF3Cipher(byte[] key, byte[] tweak) {
+        this(key, tweak, 10);
+    }
+
+    /**
      * Constructor with a custom alphabet
      *
      * @param key   encryption key used to initialize AES ECB
      * @param tweak used in each round and split into right and left sides
      * @param alphabet the cipher alphabet
      */
-    public FF3Cipher(String key, String tweak, String alphabet) {
+    public FF3Cipher(byte[] key, byte[] tweak, String alphabet) {
         this.alphabet = alphabet;
         this.radix = alphabet.length();
-
-        byte[] keyBytes = hexStringToByteArray(key);
 
         // Calculate range of supported message lengths [minLen..maxLen]
         // radix 10: 6 ... 56, 26: 5 ... 40, 36: 4 .. 36
@@ -66,10 +74,9 @@ public class FF3Cipher {
         // ToDo: With log2 we could further simplify this
         // this.maxLen = (int) (2 * Math.floor(96/Math.log2(radix)));
 
-        int keyLen = keyBytes.length;
         // Check if the key is 128, 192, or 256 bits = 16, 24, or 32 bytes
-        if (keyLen != 16 && keyLen != 24 && keyLen != 32) {
-            throw new IllegalArgumentException("key length " + keyLen + " but must be 128, 192, or 256 bits");
+        if (key.length != 16 && key.length != 24 && key.length != 32) {
+            throw new IllegalArgumentException("key length " + key.length + " but must be 128, 192, or 256 bits");
         }
 
         // While FF3 allows radices in [2, 2^16], currently only tested up to 64
@@ -82,21 +89,33 @@ public class FF3Cipher {
             throw new IllegalArgumentException("minLen or maxLen invalid, adjust your radix");
         }
 
-        this.defaultTweak = hexStringToByteArray(tweak);
+        this.defaultTweak = tweak;
 
         // AES block cipher in ECB mode with the block size derived based on the length of the key
         // Always use the reversed key since Encrypt and Decrypt call cipher expecting that
         // Feistel ciphers use the same func for encrypt/decrypt, so mode is always ENCRYPT_MODE
 
         try {
-            reverseBytes(keyBytes);
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
+            byte[] reversedKey = key.clone();
+            reverseBytes(reversedKey);
+            SecretKeySpec keySpec = new SecretKeySpec(reversedKey, "AES");
             aesCipher = Cipher.getInstance("AES/ECB/NoPadding");
             aesCipher.init(Cipher.ENCRYPT_MODE, keySpec);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             // this could happen if the JRE doesn't have the ciphers
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Constructor with a custom alphabet
+     *
+     * @param key   encryption key used to initialize AES ECB
+     * @param tweak used in each round and split into right and left sides
+     * @param alphabet the cipher alphabet
+     */
+    public FF3Cipher(String key, String tweak, String alphabet) {
+        this(hexStringToByteArray(key), hexStringToByteArray(tweak), alphabet);
     }
 
     /**
@@ -107,6 +126,17 @@ public class FF3Cipher {
      * @param radix the domain of the alphabet, 10, 26 or 36
      */
     public FF3Cipher(String key, String tweak, int radix) {
+        this(hexStringToByteArray(key), hexStringToByteArray(tweak), alphabetForBase(radix));
+    }
+
+    /**
+     * Constructor with a standardized radix
+     *
+     * @param key  encryption key used to initialize AES ECB
+     * @param tweak used in each round and split into right and left sides
+     * @param radix the domain of the alphabet, 10, 26 or 36
+     */
+    public FF3Cipher(byte[] key, byte[] tweak, int radix) {
         this(key, tweak, alphabetForBase(radix));
     }
 
