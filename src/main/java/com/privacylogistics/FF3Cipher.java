@@ -312,8 +312,10 @@ public class FF3Cipher {
         int v = n - u;
 
         // Split the message
-        char[] A = ciphertext.substring(0, u).toCharArray();
-        char[] B = ciphertext.substring(u).toCharArray();
+        char[] A = new char[u];
+        char[] B = new char[v];
+        ciphertext.getChars(0, u, A, 0);
+        ciphertext.getChars(u, ciphertext.length(), B, 0);
 
         if ((tweak.length != TWEAK_LEN) && (tweak.length != TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
