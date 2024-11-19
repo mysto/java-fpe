@@ -136,7 +136,7 @@ To run the unit tests, including all test vectors from the NIST specification, r
 
 ## Performance Benchmarks
 
-Mysto FF3 was benchmarked on a MacBook Air M2 performing 90,000 tokenization per second with mixed 8 character data input.
+Mysto FF3 was benchmarked on a MacBook Air M2 performing 105,000 tokenization per second with mixed 8 character data input.
 
 To run the performance tests:
 
