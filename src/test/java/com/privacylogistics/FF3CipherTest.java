@@ -20,15 +20,11 @@ package com.privacylogistics;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnJre;
 
+import static com.privacylogistics.FF3Cipher.*;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.math.BigInteger;
-
-import static com.privacylogistics.FF3Cipher.reverseString;
-import static com.privacylogistics.FF3Cipher.encode_int_r;
-import static com.privacylogistics.FF3Cipher.decode_int;
-import static com.privacylogistics.FF3Cipher.hexStringToByteArray;
 
 public class FF3CipherTest {
 
@@ -159,7 +155,7 @@ public class FF3CipherTest {
         String alphabet = "0123456789";
         String B = "567890000";
         byte[] W = FF3Cipher.hexStringToByteArray("FA330A73");
-        byte[] P = FF3Cipher.calculateP(i, alphabet, W, B);
+        byte[] P = FF3Cipher.calculateP(i, alphabet, W, B.toCharArray());
         assertArrayEquals(P, new byte[]
                 {(byte) 250, 51, 10, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, (byte) 129, (byte) 205});
     }
@@ -174,21 +170,21 @@ public class FF3CipherTest {
 
     @Test
     public void testEncodeBigInt() {
-        assertEquals("101", reverseString(encode_int_r(BigInteger.valueOf(5), "01", 3)));
-        assertEquals("11", reverseString(encode_int_r(BigInteger.valueOf(6), "01234", 2)));
-        assertEquals("00012", reverseString(encode_int_r(BigInteger.valueOf(7), "01234", 5)));
-        assertEquals("a", reverseString(encode_int_r(BigInteger.valueOf(10), "0123456789abcdef", 1)));
-        assertEquals("20", reverseString(encode_int_r(BigInteger.valueOf(32), "0123456789abcdef", 2)));
+        assertEquals("101", reverseString(new String(encode_int_r(BigInteger.valueOf(5), "01", 3))));
+        assertEquals("11", reverseString(new String(encode_int_r(BigInteger.valueOf(6), "01234", 2))));
+        assertEquals("00012", reverseString(new String(encode_int_r(BigInteger.valueOf(7), "01234", 5))));
+        assertEquals("a", reverseString(new String(encode_int_r(BigInteger.valueOf(10), "0123456789abcdef", 1))));
+        assertEquals("20", reverseString(new String(encode_int_r(BigInteger.valueOf(32), "0123456789abcdef", 2))));
     }
 
     @Test
     public void testDecodeInt() {
-        assertEquals(BigInteger.valueOf(321), (decode_int("321", "0123456789")));
-        assertEquals(BigInteger.valueOf(101), (decode_int("101", "0123456789")));
-        assertEquals(BigInteger.valueOf(101), (decode_int("00101", "0123456789")));
-        assertEquals(BigInteger.valueOf(0x02), (decode_int("02", "0123456789abcdef")));
-        assertEquals(BigInteger.valueOf(0xAA), (decode_int("aa", "0123456789abcdef")));
-        assertEquals(new BigInteger("2658354847544284194395037922"), (decode_int("2658354847544284194395037922", "0123456789")));
+        assertEquals(BigInteger.valueOf(321), (decode_int_r("123".toCharArray(), "0123456789")));
+        assertEquals(BigInteger.valueOf(101), (decode_int_r("101".toCharArray(), "0123456789")));
+        assertEquals(BigInteger.valueOf(101), (decode_int_r("10100".toCharArray(), "0123456789")));
+        assertEquals(BigInteger.valueOf(0x02), (decode_int_r("20".toCharArray(), "0123456789abcdef")));
+        assertEquals(BigInteger.valueOf(0xAA), (decode_int_r("aa".toCharArray(), "0123456789abcdef")));
+        assertEquals(new BigInteger("2297305934914824457484538562"), (decode_int_r("2658354847544284194395037922".toCharArray(), "0123456789")));
     }
 
     @Test

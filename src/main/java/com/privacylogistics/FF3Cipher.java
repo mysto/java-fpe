@@ -186,8 +186,11 @@ public class FF3Cipher {
         int v = n - u;
 
         // Split the message
-        String A = plaintext.substring(0, u);
-        String B = plaintext.substring(u);
+        char[] A = new char[u];
+        char[] B = new char[v];
+        plaintext.getChars(0, u, A, 0);
+        plaintext.getChars(u, plaintext.length(), B, 0);
+
         logger.trace("r {} A {} B {}", this.radix, A, B);
 
         if ((tweak.length != TWEAK_LEN) && (tweak.length != TWEAK_LEN_NEW)) {
@@ -241,7 +244,7 @@ public class FF3Cipher {
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
             // Calculate c
-            c = decode_int(reverseString(A), alphabet);
+            c = decode_int_r(A, alphabet);
 
             c = c.add(y);
 
@@ -253,14 +256,14 @@ public class FF3Cipher {
 
             logger.trace("\tm: {} A: {} c: {} y: {}", m, A, c, y);
 
-            String C = encode_int_r(c, this.alphabet, m);
+            char[] C = encode_int_r(c, this.alphabet, m);
 
             // Final steps
             A = B;
             B = C;
             logger.trace("A: {} B: {}", A, B);
         }
-        return A + B;
+        return new String(A) + new String(B);
     }
 
     /**
@@ -309,8 +312,10 @@ public class FF3Cipher {
         int v = n - u;
 
         // Split the message
-        String A = ciphertext.substring(0, u);
-        String B = ciphertext.substring(u);
+        char[] A = new char[u];
+        char[] B = new char[v];
+        ciphertext.getChars(0, u, A, 0);
+        ciphertext.getChars(u, ciphertext.length(), B, 0);
 
         if ((tweak.length != TWEAK_LEN) && (tweak.length != TWEAK_LEN_NEW)) {
             throw new IllegalArgumentException(String.format("tweak length %d is invalid: tweak must be 56 or 64 bits",
@@ -363,7 +368,7 @@ public class FF3Cipher {
             BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
 
             // Calculate c
-            c = decode_int(reverseString(B), alphabet);
+            c = decode_int_r(B, alphabet);
 
             c = c.subtract(y);
 
@@ -375,14 +380,14 @@ public class FF3Cipher {
 
             logger.trace("\tm: {} B: {} c: {} y: {}", m, B, c, y);
 
-            String C = encode_int_r(c, this.alphabet, m);
+            char[] C = encode_int_r(c, this.alphabet, m);
 
             // Final steps
             B = A;
             A = C;
             logger.trace("A: {} B: {}", A, B);
         }
-        return A + B;
+        return new String(A) + new String(B);
     }
 
     /**
@@ -413,7 +418,7 @@ public class FF3Cipher {
      * @param B            a string value
      * @return             a byte array
      */
-    protected static byte[] calculateP(int i, String alphabet, byte[] W, String B) {
+    protected static byte[] calculateP(int i, String alphabet, byte[] W, char[] B) {
 
         byte[] P = new byte[BLOCK_SIZE];     // P is always 16 bytes, zero initialized
 
@@ -428,8 +433,7 @@ public class FF3Cipher {
 
         // The remaining 12 bytes of P are copied from reverse(B) with padding
 
-        B = reverseString(B);
-        byte[] bBytes = decode_int(B, alphabet).toByteArray();
+        byte[] bBytes = decode_int_r(B, alphabet).toByteArray();
 
         System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
         logger.trace("round: {} W: {} P: {}", () -> i, () -> byteArrayToHexString(W), () -> byteArrayToIntString(P));
@@ -496,9 +500,9 @@ public class FF3Cipher {
     }
 
     /**
-     * Return a string representation of a number in the given base system
-     * - the string is right padded with zeros to length
-     * - the string is returned in reversed order expected by the calling cryptographic function
+     * Return a char[] representation of a number in the given base system
+     * - the char[] is right padded with zeros to length
+     * - the char[] is returned in reversed order expected by the calling cryptographic function
      * i.e., the decimal value 123 in five decimal places would be '32100'
      *
      *      examples:
@@ -507,9 +511,9 @@ public class FF3Cipher {
      * @param n          the integer number
      * @param alphabet   the alphabet used for encoding
      * @param length     the length used for padding the output string
-     * @return           a string encoding of the number
+     * @return           a char[] encoding of the number
      */
-    protected static String encode_int_r(BigInteger n, String alphabet, int length) {
+    protected static char[] encode_int_r(BigInteger n, String alphabet, int length) {
 
         char[] x = new char[length];
         int i=0;
@@ -526,25 +530,22 @@ public class FF3Cipher {
         while (i < length) {
             x[i++] = alphabet.charAt(0);
         }
-        return new String(x);
+        return x;
     }
 
     /**
-     * Decode a base X string representation into an integer
-     * @param str          the original string
+     * Decode a base X char[] representation into an integer.
+     *  - the BigInteger is returned in reversed order expected by the calling cryptographic function
+     * @param str          the original char[]
      * @param alphabet     the alphabet and radix (len(alphabet)) for decoding
-     * @return             an integer value of the encoded string
+     * @return             an integer value of the encoded char[]
      */
-    protected static BigInteger decode_int(String str, String alphabet) {
-
-        int strlen = str.length();
+    protected static BigInteger decode_int_r(char[] str, String alphabet) {
         BigInteger base = BigInteger.valueOf(alphabet.length());
         BigInteger num = BigInteger.ZERO;
-        int idx =0;
-        for (char each : str.toCharArray()) {
-            int exponent = (strlen - (idx + 1));
-            num = num.add(base.pow(exponent).multiply(BigInteger.valueOf(alphabet.indexOf(each))));
-            idx += 1;
+        for (int i = 0; i < str.length; i++) {
+            char ch = str[i];
+            num = num.add(base.pow(i).multiply(BigInteger.valueOf(alphabet.indexOf(ch))));
         }
         return num;
     }
