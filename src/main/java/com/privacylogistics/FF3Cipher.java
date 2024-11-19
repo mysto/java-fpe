@@ -156,8 +156,11 @@ public class FF3Cipher {
         int v = n - u;
 
         // Split the message
-        char[] A = plaintext.substring(0, u).toCharArray();
-        char[] B = plaintext.substring(u).toCharArray();
+        char[] A = new char[u];
+        char[] B = new char[v];
+        plaintext.getChars(0, u, A, 0);
+        plaintext.getChars(u, plaintext.length(), B, 0);
+
         logger.trace("r {} A {} B {}", this.radix, A, B);
 
         if ((tweak.length != TWEAK_LEN) && (tweak.length != TWEAK_LEN_NEW)) {
