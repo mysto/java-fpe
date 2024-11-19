@@ -18,15 +18,13 @@ package com.privacylogistics;
  */
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.DisabledOnJre;
+
+import static com.privacylogistics.FF3Cipher.*;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.math.BigInteger;
-
-import static com.privacylogistics.FF3Cipher.reverseString;
-import static com.privacylogistics.FF3Cipher.encode_int_r;
-import static com.privacylogistics.FF3Cipher.decode_int_r;
 
 public class FF3CipherTest {
 
@@ -119,9 +117,25 @@ public class FF3CipherTest {
     };
 
     @Test
-    public void testCreate() {
-        FF3Cipher c = new FF3Cipher("EF4359D8D580AA4F7F036D6F04FC6A94", "D8E7920AFA330A73");
-        assertNotNull(c);
+    public void testConstructors() {
+        String keyStr = "EF4359D8D580AA4F7F036D6F04FC6A94";
+        String tweakStr = "D8E7920AFA330A73";
+        byte[] keyBytes = hexStringToByteArray(keyStr);
+        byte[] tweakBytes = hexStringToByteArray(tweakStr);
+
+        FF3Cipher cs0 = new FF3Cipher(keyStr, tweakStr);
+        FF3Cipher cs1 = new FF3Cipher(keyStr, tweakStr, 62);
+        FF3Cipher cs2 = new FF3Cipher(keyStr, tweakStr, "0123456789");
+        FF3Cipher cb0 = new FF3Cipher(keyBytes, tweakBytes);
+        FF3Cipher cb1 = new FF3Cipher(keyBytes, tweakBytes, 62);
+        FF3Cipher cb2 = new FF3Cipher(keyBytes, tweakBytes, "0123456789");
+
+        assertNotNull(cs0);
+        assertNotNull(cs1);
+        assertNotNull(cs2);
+        assertNotNull(cb0);
+        assertNotNull(cb1);
+        assertNotNull(cb2);
     }
 
     @Test
@@ -165,10 +179,10 @@ public class FF3CipherTest {
 
     @Test
     public void testDecodeInt() {
-        assertEquals(BigInteger.valueOf(123), (decode_int_r("321".toCharArray(), "0123456789")));
+        assertEquals(BigInteger.valueOf(321), (decode_int_r("123".toCharArray(), "0123456789")));
         assertEquals(BigInteger.valueOf(101), (decode_int_r("101".toCharArray(), "0123456789")));
         assertEquals(BigInteger.valueOf(101), (decode_int_r("10100".toCharArray(), "0123456789")));
-        assertEquals(BigInteger.valueOf(0x20), (decode_int_r("02".toCharArray(), "0123456789abcdef")));
+        assertEquals(BigInteger.valueOf(0x02), (decode_int_r("20".toCharArray(), "0123456789abcdef")));
         assertEquals(BigInteger.valueOf(0xAA), (decode_int_r("aa".toCharArray(), "0123456789abcdef")));
         assertEquals(new BigInteger("2297305934914824457484538562"), (decode_int_r("2658354847544284194395037922".toCharArray(), "0123456789")));
     }
@@ -221,7 +235,7 @@ public class FF3CipherTest {
     }
 
     @Test
-    public void testFF3_1() throws Exception {
+    public void testFF3_1_str() throws Exception {
         // Test with 56 bit tweak
         String[] testVector = TestVectors[0];
         FF3Cipher c = new FF3Cipher(testVector[Tkey], "D8E7920AFA330A", Integer.parseInt(testVector[Tradix]));
@@ -233,7 +247,19 @@ public class FF3CipherTest {
     }
 
     @Test
-    @EnabledOnJre(value = JRE.JAVA_11)
+    public void testFF3_1_bytes() throws Exception {
+        // Test with 56 bit tweak
+        String[] testVector = TestVectors[0];
+        FF3Cipher c = new FF3Cipher(hexStringToByteArray(testVector[Tkey]), hexStringToByteArray("D8E7920AFA330A"), Integer.parseInt(testVector[Tradix]));
+        String pt = testVector[Tplaintext], ct = "477064185124354662";
+        String ciphertext = c.encrypt(pt);
+        String plaintext = c.decrypt(ciphertext);
+        assertEquals(ct, ciphertext);
+        assertEquals(pt, plaintext);
+    }
+
+    @Test
+    @DisabledOnJre(JRE.JAVA_8)
     public void testCustomAlphabet() throws Exception {
         // Check the first NIST 128-bit test vector using superscript characters
         String alphabet = "⁰¹²³⁴⁵⁶⁷⁸⁹";
