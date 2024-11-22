@@ -20,13 +20,13 @@ package com.privacylogistics;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.libj.math.BigInt;
 
 /**
  * Class FF3Cipher implements the FF3 format-preserving encryption algorithm
@@ -213,14 +213,14 @@ public class FF3Cipher {
         // Pre-calculate the modulus since it's only one of 2 values,
         // depending on whether it is even or odd
 
-        BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
-        BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
+        BigInt modU = new BigInt(this.radix).pow(u);
+        BigInt modV = new BigInt(this.radix).pow(v);
         logger.trace("u {} v {} modU: {} modV: {}", u, v, modU, modV);
         logger.trace("tL: {} tR: {}", () -> byteArrayToHexString(Tl), () -> byteArrayToHexString(Tr));
 
         for (byte i = 0; i < NUM_ROUNDS; ++i) {
             int m;
-            BigInteger c;
+            BigInt c;
             byte[] W;
 
             // Determine alternating Feistel round side, right or left
@@ -241,7 +241,7 @@ public class FF3Cipher {
             reverseBytes(S);
             logger.trace("\tS: {}", () -> byteArrayToHexString(S));
 
-            BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
+            BigInt y = byteArrayToBigInt(S);
 
             // Calculate c
             c = decode_int_r(A, alphabet);
@@ -337,14 +337,14 @@ public class FF3Cipher {
         // Pre-calculate the modulus since it's only one of 2 values,
         // depending on whether it is even or odd
 
-        BigInteger modU = BigInteger.valueOf(this.radix).pow(u);
-        BigInteger modV = BigInteger.valueOf(this.radix).pow(v);
+        BigInt modU = new BigInt(radix).pow(u);
+        BigInt modV = new BigInt(radix).pow(v);
         logger.trace("modU: {} modV: {}", modU, modV);
         logger.trace("tL: {} tR: {}", () -> byteArrayToHexString(Tl), () -> byteArrayToHexString(Tr));
 
         for (byte i = (byte) (NUM_ROUNDS - 1); i >= 0; --i) {
             int m;
-            BigInteger c;
+            BigInt c;
             byte[] W;
 
             // Determine alternating Feistel round side, right or left
@@ -365,12 +365,12 @@ public class FF3Cipher {
             reverseBytes(S);
             logger.trace("\tS: {}", () -> byteArrayToHexString(S));
 
-            BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
+            BigInt y = byteArrayToBigInt(S);
 
             // Calculate c
             c = decode_int_r(B, alphabet);
 
-            c = c.subtract(y);
+            c = c.sub(y);
 
             if (i % 2 == 0) {
                 c = c.mod(modU);
@@ -433,7 +433,7 @@ public class FF3Cipher {
 
         // The remaining 12 bytes of P are copied from reverse(B) with padding
 
-        byte[] bBytes = decode_int_r(B, alphabet).toByteArray();
+        byte[] bBytes = decode_int_r(B, alphabet).toByteArray(false);
 
         System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
         logger.trace("round: {} W: {} P: {}", () -> i, () -> byteArrayToHexString(W), () -> byteArrayToIntString(P));
@@ -500,10 +500,31 @@ public class FF3Cipher {
     }
 
     /**
+     * Return a BigInt value of a byte array with absolute behavior.
+     * This has the same behavior as constructing a BigInteger by
+     * passing in a hex string with radix = 16.
+     *
+     * @param b byte array to convert
+     */
+    public static BigInt byteArrayToBigInt(byte[] b) {
+        if (b[0] < 0) {
+            byte[] wb = new byte[b.length + 1];
+            wb[0] = 0;
+            System.arraycopy(b, 0, wb, 1, b.length);
+            return new BigInt(wb, false);
+        } else {
+            return new BigInt(b, false);
+        }
+    }
+
+    /**
      * Return a char[] representation of a number in the given base system
      * - the char[] is right padded with zeros to length
      * - the char[] is returned in reversed order expected by the calling cryptographic function
-     * i.e., the decimal value 123 in five decimal places would be '32100'
+     * i.e., the decimal value 123 in five decimal places would be '32100'.
+     * Note: in order to efficiently encode its input, this method mutates the value of `n`.
+     * If you would like to preserve the value of the input, pass a `clone()` of `n` to this
+     * method.
      *
      *      examples:
      *         encode_int_r(10, 16,2)
@@ -513,16 +534,15 @@ public class FF3Cipher {
      * @param length     the length used for padding the output string
      * @return           a char[] encoding of the number
      */
-    protected static char[] encode_int_r(BigInteger n, String alphabet, int length) {
-
+    protected static char[] encode_int_r(BigInt n, String alphabet, int length) {
         char[] x = new char[length];
         int i=0;
 
-        BigInteger bbase =  BigInteger.valueOf(alphabet.length());
+        int base = alphabet.length();
+        BigInt bbase = new BigInt(base);
         while (n.compareTo(bbase) >= 0) {
-            BigInteger b = n.mod(bbase);
-            n = n.divide(bbase);
-            x[i++] = alphabet.charAt(b.intValue());
+            int b = (int) n.divRem(base);
+            x[i++] = alphabet.charAt(b);
         }
         x[i++] = alphabet.charAt(n.intValue());
 
@@ -540,12 +560,14 @@ public class FF3Cipher {
      * @param alphabet     the alphabet and radix (len(alphabet)) for decoding
      * @return             an integer value of the encoded char[]
      */
-    protected static BigInteger decode_int_r(char[] str, String alphabet) {
-        BigInteger base = BigInteger.valueOf(alphabet.length());
-        BigInteger num = BigInteger.ZERO;
+    protected static BigInt decode_int_r(char[] str, String alphabet) {
+        int radix = alphabet.length();
+        BigInt num = new BigInt(0);
+
         for (int i = 0; i < str.length; i++) {
             char ch = str[i];
-            num = num.add(base.pow(i).multiply(BigInteger.valueOf(alphabet.indexOf(ch))));
+            BigInt base = new BigInt(radix);
+            num = num.add(base.pow(i).mul(alphabet.indexOf(ch)));
         }
         return num;
     }
