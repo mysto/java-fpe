@@ -77,7 +77,7 @@ The example code below can help you get started.
 Using default domain [0-9]
 
 ```jshell
-   jshell --class-path build/libs/ff3-X.X.jar:~/lib/log4j-core-2.14.0.jar:~/lib/log4j-api-2.14.0.jar
+   jshell --class-path build/libs/ff3-X.X.jar:~/lib/log4j-core-2.24.3.jar:~/lib/log4j-api-2.24.3.jar
 
     import com.privacylogistics.FF3Cipher;
     FF3Cipher c = new FF3Cipher("2DE79D232DF5585D68CE47882AE256D6", "CBD09280979564");
