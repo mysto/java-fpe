@@ -9,6 +9,7 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
+    maven("https://maven.repository.redhat.com/ga/")
 }
 
 dependencies {
@@ -17,6 +18,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.apache.logging.log4j:log4j-api:2.23.1")
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
+    implementation("org.libj:math:0.6.8")
 }
 
 group = "io.github.mysto"
