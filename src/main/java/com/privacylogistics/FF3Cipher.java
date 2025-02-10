@@ -433,10 +433,16 @@ public class FF3Cipher {
 
         // The remaining 12 bytes of P are copied from reverse(B) with padding
 
-        byte[] bBytes = decode_int_r(B, alphabet).toByteArray();
+        BigInteger val = decode_int_r(B, alphabet);
+        byte[] bBytes = val.toByteArray();
 
-        System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
-        logger.trace("round: {} W: {} P: {}", () -> i, () -> byteArrayToHexString(W), () -> byteArrayToIntString(P));
+        // BigInteger's toByteArray may return a 13th sign byte, but we consider the value unsigned
+        if (bBytes.length > 12) {
+            System.arraycopy(bBytes, 1, P, (BLOCK_SIZE - 12), 12);
+        } else {
+            System.arraycopy(bBytes, 0, P, (BLOCK_SIZE - bBytes.length), bBytes.length);
+        }
+        logger.trace("round: {} P: {} W: {}", () -> i, () -> byteArrayToHexString(P), () -> byteArrayToHexString(W));
         return P;
     }
 
@@ -453,7 +459,7 @@ public class FF3Cipher {
      * Reverse a byte array in-place
      * @param b            a mutable byte array
      */
-    protected void reverseBytes(byte[] b) {
+    protected static void reverseBytes(byte[] b) {
         for (int i = 0; i < b.length / 2; i++) {
             byte temp = b[i];
             b[i] = b[b.length - i - 1];
@@ -466,7 +472,7 @@ public class FF3Cipher {
      * @param s          a character string containing hexadecimal digits
      * @return           a byte array with the values parsed from the string
      */
-    protected static byte[] hexStringToByteArray(String s) {
+    public static byte[] hexStringToByteArray(String s) {
         byte[] data = new byte[s.length() / 2];
         for (int i = 0; i < s.length(); i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
@@ -490,14 +496,6 @@ public class FF3Cipher {
         return new String(hexChars, StandardCharsets.UTF_8);
     }
 
-    /**
-     * used for debugging output
-     * @param byteArray  a byte array
-     * @return           a decimal string encoding of a number
-     */
-    protected static String byteArrayToIntString(byte[] byteArray) {
-        return Arrays.toString(byteArray);
-    }
 
     /**
      * Return a char[] representation of a number in the given base system

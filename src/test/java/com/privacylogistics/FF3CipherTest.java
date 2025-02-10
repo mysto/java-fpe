@@ -188,6 +188,18 @@ public class FF3CipherTest {
     }
 
     @Test
+    public void testReverseBytes() {
+        byte [] mutableArray = new byte[] {1};
+        reverseBytes(mutableArray);
+        assertArrayEquals(new byte[]{1}, mutableArray);
+        mutableArray = new byte[] {1,2,3};
+        reverseBytes(mutableArray);
+        assertArrayEquals(new byte[]{3,2,1}, mutableArray);
+        mutableArray = new byte[] {1,2,3,4};
+        reverseBytes(mutableArray);
+        assertArrayEquals(new byte[]{4,3,2,1}, mutableArray);
+    }
+    @Test
     public void testNistFF3() throws Exception {
         // NIST FF3-AES 128, 192, 256
         for( String[] testVector : TestVectors) {
@@ -285,6 +297,23 @@ public class FF3CipherTest {
         String pt = "liebeGrüße";
         String ct = "5kÖQbairXo";
         FF3Cipher c = new FF3Cipher(key, tweak, german_alphabet);
+        String ciphertext = c.encrypt(pt);
+        assertEquals(ct, ciphertext);
+        String plaintext = c.decrypt(ciphertext);
+        assertEquals(pt, plaintext);
+    }
+
+    @Test
+    public void testDecodeIntHighByte() throws Exception {
+        // Test the German alphabet with a radix of 70.  German consists of the latin alphabet
+        // plus four additional letters, each of which have uppercase and lowercase letters
+
+        String alphabet = FF3Cipher.ASCII_UPPERCASE + FF3Cipher.ASCII_LOWERCASE + DIGITS;
+        String key = "2DE79D232DF5585D68CE47882AE256D6";
+        String tweak = "CBD09280979564";
+        String pt = "Ceciestuntestdechiffrement123cet";
+        String ct = "0uaTPI9g49f9MMw54OvY8x5rmNcrhydM";
+        FF3Cipher c = new FF3Cipher(key, tweak, alphabet);
         String ciphertext = c.encrypt(pt);
         assertEquals(ct, ciphertext);
         String plaintext = c.decrypt(ciphertext);
