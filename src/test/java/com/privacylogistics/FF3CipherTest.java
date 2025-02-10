@@ -304,9 +304,9 @@ public class FF3CipherTest {
     }
 
     @Test
-    public void testDecodeIntHighByte() throws Exception {
-        // Test the German alphabet with a radix of 70.  German consists of the latin alphabet
-        // plus four additional letters, each of which have uppercase and lowercase letters
+    public void testDecodeBigIntegerWithLeadingSignByte() throws Exception {
+        // toByteArray can generate a 13 byte array with a leading 0x00 to represent the sign
+        // we expect max 12 bytes and need to strip that.
 
         String alphabet = FF3Cipher.ASCII_UPPERCASE + FF3Cipher.ASCII_LOWERCASE + DIGITS;
         String key = "2DE79D232DF5585D68CE47882AE256D6";
