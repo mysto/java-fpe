@@ -87,6 +87,17 @@ Using default domain [0-9]
     pt;ciphertext;plaintext
 ```
 
+to enable TRACE level messages:
+```jshell
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.Level;
+Logger logger = LogManager.getRootLogger();
+Configurator.setRootLevel(Level.TRACE);
+
+```
+
 ## Custom alphabets
 
 Custom alphabets up to 256 characters are supported. To use an alphabet consisting of the uppercase letters A-F (radix=6), we can continue
