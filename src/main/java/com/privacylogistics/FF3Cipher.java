@@ -140,6 +140,14 @@ public class FF3Cipher {
         this(key, tweak, alphabetForBase(radix));
     }
 
+    public int getMinMessageLength() {
+        return minLen;
+    }
+
+    public int getMaxMessageLength() {
+        return maxLen;
+    }
+
     /**
      * Encrypt a value using default tweak
      * @param plaintext   a plaintext to encrypt
