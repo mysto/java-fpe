@@ -565,9 +565,6 @@ public class FF3Cipher {
         switch (base) {
             case 10:
                 return DIGITS;
-            case 26:
-                // used by NIST test vectors but deprecated in constructor
-                // return DIGITS + "abcdefghijklmnop";
             case 36:
                 return DIGITS + ASCII_UPPERCASE;
             case 62:
@@ -583,12 +580,12 @@ public class FF3Cipher {
     private static final int TWEAK_LEN =    8;       // Original FF3 64-bit tweak length
     private static final int TWEAK_LEN_NEW =  7;     // FF3-1 56-bit tweak length
     private static final int HALF_TWEAK_LEN = TWEAK_LEN/2;
-    private static int MAX_RADIX =    256;
+    private static final int MAX_RADIX =    256;
     private static final Logger logger = LogManager.getLogger(FF3Cipher.class.getName());
 
     /** The recommendation in Draft SP 800-38G was strengthened to a requirement in Draft SP 800-38G Revision 1:
        the minimum domain size for FF1 and FF3-1 is one million */
-    public static int DOMAIN_MIN =  1000000;  // 1M
+    public static final int DOMAIN_MIN =  1000000;  // 1M
     public static final String DIGITS = ("0123456789");
     public static final String ASCII_LOWERCASE = ("abcdefghijklmnopqrstuvwxyz");
     public static final String ASCII_UPPERCASE = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
