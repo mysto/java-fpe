@@ -1,6 +1,6 @@
 plugins {
     java
-    // id("me.champeau.jmh") version "0.7.2"
+    // id("me.champeau.jmh") version "0.7.3"
     `maven-publish`
     signing
 }
@@ -63,10 +63,6 @@ publishing {
                 name.set("ff3")
                 description.set("A Format-preserving encryption library for FF3-1")
                 url.set("http://privacylogistics.com")
-                properties.set(mapOf(
-                    "myProp" to "value",
-                    "prop.with.dots" to "anotherValue"
-                ))
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
