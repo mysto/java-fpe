@@ -161,6 +161,13 @@ To run the performance tests:
 
 This project was built and tested with Java 8 and 11.  It uses the javax.crypto for AES encryption in ECB mode.
 
+## Reporting Issues and Contributing
+
+Bug reports, feature requests, and pull requests are welcome.  Please use the GitHub Issues page to report problems or ask questions:
+https://github.com/mysto/java-fpe/issues
+
+All documentation and issue discussions are conducted in English.
+
 ## Implementation Notes
 
 This implementation follows the algorithm as outlined in the NIST specification as closely as possible, including naming.
