@@ -12,21 +12,23 @@
   </a>
 </p>
 
+NOTE: NIST's February 2025 Draft 2 has entirely withdrawn FF3 from the NIST standard due to published vulnerabilities.
+
+This software is provided for educational and experimental use and comes with no warranty of any kind.
+It is intended for developers and researchers familiar with cryptographic standards.
+
 # ff3 - Format Preserving Encryption in Java
 
-java-fpe provides Format-Preserving Encryption (FPE) for Java, allowing sensitive data such as credit card numbers, account IDs, phone numbers, and dates to be encrypted **while preserving their original format**. This is useful in systems that require encrypted data to maintain fixed-length, numeric, or structured formats.
+java-fpe provides Format-Preserving Encryption (FPE) for Java, allowing sensitive data such as numeric identifiers, account IDs, phone numbers, and dates to be encrypted **while preserving their original format**. This is useful in systems that require encrypted data to maintain fixed-length, numeric, or structured formats.
 
-It implements the NIST-approved FF3 and FF3-1 algorithms as specified in NIST Special Publication 800-38G and includes the revisions on February 28th, 2019 with a draft update for FF3-1.
+This package implements the FF3 and FF3-1 algorithms as specified in NIST Special Publication 800-38G (now withdrawn) and includes the revisions on February 28th, 2019 with a draft update for FF3-1 (now withdrawn). FF1 implementations are outside the scope of this open source project. 
 
 * [NIST Recommendation SP 800-38G (FF3)](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
 * [NIST Recommendation SP 800-38G Revision 1 (FF3-1)](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf)
 * [NIST SP 800-38G Revision 1 (2nd Public Draft)](https://csrc.nist.gov/pubs/sp/800/38/g/r1/2pd)
 
-**NOTE:** NIST's Feburary 2025 Draft 2 has removed FF3 from the NIST standard. Contact me about a licensed version of FF1 in Java.
-
 Changes to minimum domain size and revised tweak length have been implemented in this package with
-both 64-bit and 56-bit tweaks are supported. NIST has only published official test vectors for 64-bit tweaks, but draft ACVP test vectors have been used for testing FF3-1. It is expected the final
-NIST standard will provide updated test vectors with 56-bit tweak lengths.
+both 64-bit and 56-bit tweaks are supported. NIST has only published official test vectors for 64-bit tweaks, but draft ACVP test vectors have been used for testing FF3-1. 
 
 ## Use
 
@@ -65,12 +67,12 @@ Input plaintext has maximum length restrictions based upon the chosen radix (2 *
 * radix 36: 36
 * radix 62: 32
 
-To work around string length, its possible to encode longer text in chunks.
+To work around string length, it's possible to encode longer text in chunks.
 
-The key length must be 128, 192, or 256 bits in length. The tweak is 7 bytes (FF3-1) or 8 bytes for the origingal FF3.
+The key length must be 128, 192, or 256 bits in length. The tweak is 7 bytes (FF3-1) or 8 bytes for the original FF3.
 
 As with any cryptographic package, managing and protecting the key(s) is crucial. The tweak is generally not kept secret.
-This package does not store the key in memory after initializing the cipher.
+This implementation does not intentionally retain key material beyond cipher initialization.
 
 ## Code Example
 
@@ -125,14 +127,14 @@ The FF3 round function uses AES encryption in ECB mode, which is performed each 
 on alternating halves of the text being encrypted. The *key* value is used only to initialize the AES cipher. Thereafter
 the *tweak* is used together with the intermediate encrypted text as input to the round function.
 
-FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec.
+FF3 uses a single-block encryption with an IV of 0, which is effectively ECB mode. AES ECB is the only block cipher function which matches the requirement of the FF3 spec. This does not imply that ECB mode is safe for general-purpose encryption; it is used here solely because it is required by the FF3 specification.
 
 The domain size was revised in FF3-1 to radix<sup>minLen</sup> >= 1,000,000 and is represented by the constant `DOMAIN_MIN` in `FF3Cipher.java`. 
 FF3-1 is in draft status and updated 56-bit test vectors are not yet available.
 
 ## Other FPE Algorithms
 
-Only FF1 and FF3 have been approved by NIST for format preserving encryption. There are patent claims on FF1 which allegedly include open source implementations. Given the issues raised in ["The Curse of Small Domains: New Attacks on Format-Preserving Encryption"](https://eprint.iacr.org/2018/556.pdf) by Hoang, Tessaro and Trieu in 2018, it is prudent to be very cautious about using any FPE that isn't a standard and hasn't stood up to public scrutiny.
+Only FF1 and FF3 have been published by NIST for format preserving encryption. There are patent claims on FF1 which allegedly include open source implementations. Given the issues raised in ["The Curse of Small Domains: New Attacks on Format-Preserving Encryption"](https://eprint.iacr.org/2018/556.pdf) by Hoang, Tessaro and Trieu in 2018, it is prudent to be very cautious about using any FPE that isn't a standard and hasn't stood up to public scrutiny.
 
 ## Build & Testing
 
@@ -149,7 +151,7 @@ To run the unit tests, including all test vectors from the NIST specification, r
 
 ## Performance Benchmarks
 
-Mysto FF3 was benchmarked on a MacBook Air M2 performing 105,000 tokenization per second with mixed 8 character data input.
+Mysto FF3 was benchmarked on a MacBook Air M2 performing 105,000 tokenization per second with mixed 8 character data input. Performance results are indicative only and depend on hardware, workload, and configuration
 
 To run the performance tests:
 
@@ -164,15 +166,15 @@ This project was built and tested with Java 8 and 11.  It uses the javax.crypto 
 ## Reporting Issues and Contributing
 
 Bug reports, feature requests, and pull requests are welcome.  Please use the GitHub Issues page to report problems or ask questions:
-https://github.com/mysto/java-fpe/issues
+https://github.com/mysto/java-fpe/issues.
 
-All documentation and issue discussions are conducted in English.
+By contributing, you agree that your contributions are provided under the Apache 2.0 license. All documentation and issue discussions are conducted in English.
 
 ## Implementation Notes
 
 This implementation follows the algorithm as outlined in the NIST specification as closely as possible, including naming.
 
-FPE can be used for sensitive data tokenization, especially with PCI and cryptographically reversible tokens. This implementation does not provide any guarantees regarding PCI DSS or other validation.
+FPE can be used for data tokenization of sensitive data which is cryptographically reversible. This implementation does not provide any guarantees regarding PCI DSS or other validation.
 
 The tweak is required in the initial `FF3Cipher` constructor, but can optionally be overridden in each `encrypt` and `decrypt` call. This is similar to passing an IV or nonce when creating an encryptor object.
 
