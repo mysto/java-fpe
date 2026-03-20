@@ -249,7 +249,7 @@ public class FF3Cipher {
             reverseBytes(S);
             logger.trace("\tS: {}", () -> byteArrayToHexString(S));
 
-            BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
+            BigInteger y = new BigInteger(1, S);
 
             // Calculate c
             c = decode_int_r(A, alphabet);
@@ -373,7 +373,7 @@ public class FF3Cipher {
             reverseBytes(S);
             logger.trace("\tS: {}", () -> byteArrayToHexString(S));
 
-            BigInteger y = new BigInteger(byteArrayToHexString(S), 16);
+            BigInteger y = new BigInteger(1, S);
 
             // Calculate c
             c = decode_int_r(B, alphabet);
