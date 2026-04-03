@@ -14,7 +14,7 @@
 
 **⚠️ WARNING**
  
-NOTE: NIST's February 2025 Draft 2 has entirely withdrawn FF3 from the NIST standard due to published vulnerabilities.
+NOTE: NIST's February 2025 Draft 2 has entirely withdrawn FF3 and FF3-1 from the NIST standard due to published vulnerabilities.
 
 This software is provided for educational and experimental use and comes with no warranty of any kind.
 It is intended for developers and researchers familiar with cryptographic standards.
